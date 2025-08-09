@@ -1,9 +1,9 @@
 package com.assignment.zospend.ui.entry
 
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,12 +36,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.assignment.zospend.R
 import com.assignment.zospend.domain.model.Category
 import com.assignment.zospend.ui.components.BodyRegular
 import com.assignment.zospend.ui.components.LabelMedium
@@ -49,6 +56,7 @@ import com.assignment.zospend.ui.components.PrimaryButton
 import com.assignment.zospend.ui.components.SecondaryButton
 import com.assignment.zospend.ui.components.TitleLarge
 import com.assignment.zospend.ui.theme.ZospendTheme
+import kotlinx.coroutines.delay
 import java.text.NumberFormat
 
 @Composable
@@ -57,7 +65,7 @@ fun EntryScreen(
     viewModel: EntryViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
+    val duplicateErrorMessage = stringResource(id = R.string.duplicate_expense_error)
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
@@ -65,18 +73,10 @@ fun EntryScreen(
         viewModel.onReceiptSelected(uri?.toString())
     }
 
-    LaunchedEffect(uiState.addExpenseResult) {
-        uiState.addExpenseResult?.let { result ->
-            val message = if (result.isSuccess) {
-                "Expense added successfully"
-            } else {
-                result.exceptionOrNull()?.message ?: "An error occurred"
-            }
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-            viewModel.onAddExpenseResultConsumed()
-            if (result.isSuccess) {
-                onDismiss()
-            }
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            delay(2000) // Show animation for 2 seconds
+            onDismiss()
         }
     }
 
@@ -86,111 +86,148 @@ fun EntryScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TitleLarge("Add Expense")
-        Spacer(modifier = Modifier.height(24.dp))
+        if (uiState.isSuccess) {
+            SuccessAnimation {
+                onDismiss()
+            }
+        } else {
+            TitleLarge("Add Expense")
+            Spacer(modifier = Modifier.height(24.dp))
 
-        OutlinedTextField(
-            value = uiState.title,
-            onValueChange = viewModel::onTitleChange,
-            label = { LabelMedium("Title") },
-            isError = uiState.titleError,
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        if (uiState.titleError) {
-            BodyRegular("Title cannot be empty", color = MaterialTheme.colorScheme.error)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        OutlinedTextField(
-            value = uiState.amount,
-            onValueChange = viewModel::onAmountChange,
-            label = { LabelMedium("Amount (in Rupees)") },
-            isError = uiState.amountError,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            singleLine = true,
-            prefix = { LabelMedium(NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0]).currency?.symbol.orEmpty()) },
-            modifier = Modifier.fillMaxWidth()
-        )
-        if (uiState.amountError) {
-            BodyRegular(
-                "Amount must be a valid number greater than 0",
-                color = MaterialTheme.colorScheme.error,
+            OutlinedTextField(
+                value = uiState.title,
+                onValueChange = viewModel::onTitleChange,
+                label = { LabelMedium("Title") },
+                isError = uiState.titleError,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
             )
-        }
+            if (uiState.titleError) {
+                BodyRegular("Title cannot be empty", color = MaterialTheme.colorScheme.error)
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        CategoryDropDown(
-            selectedCategory = uiState.category,
-            onCategorySelected = viewModel::onCategoryChange
-        )
+            OutlinedTextField(
+                value = uiState.amount,
+                onValueChange = viewModel::onAmountChange,
+                label = { LabelMedium("Amount (in Rupees)") },
+                isError = uiState.amountError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                singleLine = true,
+                prefix = { LabelMedium(NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0]).currency?.symbol.orEmpty()) },
+                modifier = Modifier.fillMaxWidth()
+            )
+            if (uiState.amountError) {
+                BodyRegular(
+                    "Amount must be a valid number greater than 0",
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = uiState.note,
-            onValueChange = viewModel::onNoteChange,
-            label = { LabelMedium("Notes (Optional, max 100 chars)") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-        )
+            CategoryDropDown(
+                selectedCategory = uiState.category,
+                onCategorySelected = viewModel::onCategoryChange
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            SecondaryButton(
-                modifier = Modifier.fillMaxWidth(0.5f),
-                onClick = {
-                    photoPickerLauncher.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly
+            OutlinedTextField(
+                value = uiState.note,
+                onValueChange = viewModel::onNoteChange,
+                label = { LabelMedium("Notes (Optional, max 100 chars)") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(100.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                SecondaryButton(
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    onClick = {
+                        photoPickerLauncher.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
                         )
-                    )
-                },
-                text = if (uiState.selectedReceiptUri == null) "Add Receipt" else "Change Receipt"
-            )
+                    },
+                    text = if (uiState.selectedReceiptUri == null) "Add Receipt" else "Change Receipt"
+                )
 
-            if (uiState.selectedReceiptUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(uiState.selectedReceiptUri)
-                            .crossfade(true)
-                            .build()
-                    ),
-                    contentDescription = "Selected receipt",
-                    modifier = Modifier.size(64.dp),
-                    contentScale = ContentScale.Crop
+                if (uiState.selectedReceiptUri != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(uiState.selectedReceiptUri)
+                                .crossfade(true)
+                                .build()
+                        ),
+                        contentDescription = "Selected receipt",
+                        modifier = Modifier.size(64.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                SecondaryButton(
+                    onClick = {
+                        viewModel.onAddExpenseResultConsumed()
+                        onDismiss()
+                    },
+                    text = "Cancel",
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .fillMaxWidth(0.5f)
+                )
+                PrimaryButton(
+                    onClick = viewModel::addExpense,
+                    text = "Save Expense"
+                )
+            }
+
+            AnimatedVisibility(visible = uiState.isDuplicate) {
+                BodyRegular(
+                    text = duplicateErrorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            SecondaryButton(
-                onClick = onDismiss,
-                text = "Cancel",
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .fillMaxWidth(0.5f)
-            )
-            PrimaryButton(
-                onClick = viewModel::addExpense,
-                text = "Save Expense"
-            )
+@Composable
+fun SuccessAnimation(onDismiss: () -> Unit) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.success_anim))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = 1, // Set to 1 for a single playback
+        isPlaying = true // Start playing immediately
+    )
+    LaunchedEffect(progress) {
+        if (progress == 1.0f) {
+            onDismiss()
         }
     }
+    LottieAnimation(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

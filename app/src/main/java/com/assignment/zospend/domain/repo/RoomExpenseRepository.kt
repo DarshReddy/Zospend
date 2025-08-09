@@ -1,5 +1,6 @@
 package com.assignment.zospend.domain.repo
 
+import android.database.sqlite.SQLiteConstraintException
 import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.data.local.ExpenseDao
 import kotlinx.coroutines.flow.map
@@ -15,9 +16,9 @@ class RoomExpenseRepository(private val expenseDao: ExpenseDao) : ExpenseReposit
 
     override suspend fun add(expense: Expense): Result<Unit> {
         return try {
-            expenseDao.upsertExpense(expense)
+            expenseDao.insertExpense(expense)
             Result.success(Unit)
-        } catch (e: Exception) {
+        } catch (e: SQLiteConstraintException) {
             Result.failure(e)
         }
     }

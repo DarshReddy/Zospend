@@ -1,7 +1,7 @@
-
 package com.assignment.zospend.ui.entry
 
 import android.app.Application
+import android.database.sqlite.SQLiteConstraintException
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
@@ -20,7 +20,8 @@ data class EntryUiState(
     val selectedReceiptUri: String? = null,
     val titleError: Boolean = false,
     val amountError: Boolean = false,
-    val addExpenseResult: Result<Unit>? = null
+    val isDuplicate: Boolean = false,
+    val isSuccess: Boolean = false
 )
 
 class EntryViewModel(application: Application) : AndroidViewModel(application) {
@@ -30,18 +31,19 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
     val uiState = _uiState.asStateFlow()
 
     fun onTitleChange(newTitle: String) {
-        _uiState.value = _uiState.value.copy(title = newTitle, titleError = false)
+        _uiState.value =
+            _uiState.value.copy(title = newTitle, titleError = false, isDuplicate = false)
     }
 
     fun onAmountChange(newAmount: String) {
-        // Allow only digits
         if (newAmount.all { it.isDigit() }) {
-            _uiState.value = _uiState.value.copy(amount = newAmount, amountError = false)
+            _uiState.value =
+                _uiState.value.copy(amount = newAmount, amountError = false, isDuplicate = false)
         }
     }
 
     fun onCategoryChange(newCategory: Category) {
-        _uiState.value = _uiState.value.copy(category = newCategory)
+        _uiState.value = _uiState.value.copy(category = newCategory, isDuplicate = false)
     }
 
     fun onNoteChange(newNote: String) {
@@ -55,7 +57,7 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onAddExpenseResultConsumed() {
-        _uiState.value = _uiState.value.copy(addExpenseResult = null)
+        _uiState.value = _uiState.value.copy(isSuccess = false, isDuplicate = false)
     }
 
     fun addExpense() {
@@ -85,10 +87,11 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             val result = repository.add(newExpense)
-            _uiState.value = _uiState.value.copy(addExpenseResult = result)
             if (result.isSuccess) {
                 // Clear form on success, keep category
-                _uiState.value = EntryUiState(category = _uiState.value.category)
+                _uiState.value = EntryUiState(isSuccess = true)
+            } else if (result.exceptionOrNull() is SQLiteConstraintException) {
+                _uiState.value = _uiState.value.copy(isDuplicate = true)
             }
         }
     }

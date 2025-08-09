@@ -1,6 +1,7 @@
 package com.assignment.zospend.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverter
 import com.assignment.zospend.domain.model.Category
@@ -8,7 +9,10 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-@Entity(tableName = "expenses")
+@Entity(
+    tableName = "expenses",
+    indices = [Index(value = ["amount", "title", "category"], unique = true)]
+)
 data class Expense(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,

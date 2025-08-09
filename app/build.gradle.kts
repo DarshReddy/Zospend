@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.coil)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.lottie.compose)
 
     // Room
     implementation(libs.androidx.room.runtime)

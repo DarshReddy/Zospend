@@ -1,8 +1,8 @@
 package com.assignment.zospend.data.local
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,6 +13,6 @@ interface ExpenseDao {
     @Query("SELECT * FROM expenses WHERE id = :id")
     suspend fun getExpenseById(id: Int): Expense?
 
-    @Upsert
-    suspend fun upsertExpense(expense: Expense)
+    @Insert
+    suspend fun insertExpense(expense: Expense)
 }
