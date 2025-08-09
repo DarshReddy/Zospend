@@ -6,12 +6,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.LightMode
+import androidx.compose.material.icons.outlined.Nightlight
+import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -48,7 +50,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit
+) {
     val navController = rememberNavController()
     val sheetState = rememberModalBottomSheetState(true)
     val scope = rememberCoroutineScope()
@@ -66,6 +71,12 @@ fun MainScreen() {
             TopAppBar(
                 title = { Text(text = "Zospend") },
                 actions = {
+                    IconButton(onClick = onThemeToggle) {
+                        Icon(
+                            imageVector = if (isDarkTheme) Icons.Outlined.LightMode else Icons.Outlined.Nightlight,
+                            contentDescription = "Toggle Theme"
+                        )
+                    }
                     AnimatedVisibility(visible = currentRoute == Screen.Reports.route) {
                         IconButton(onClick = {
                             shareReport(
@@ -130,7 +141,7 @@ fun AppBottomBar(
         NavigationBarItem(
             icon = {
                 Icon(
-                    imageVector = if (isTodaySelected) Icons.Filled.DateRange else Icons.Outlined.DateRange,
+                    imageVector = if (isTodaySelected) Icons.Filled.Today else Icons.Outlined.Today,
                     contentDescription = "Today"
                 )
             },
@@ -146,7 +157,7 @@ fun AppBottomBar(
         NavigationBarItem(
             icon = {
                 Icon(
-                    imageVector = if (isReportsSelected) Icons.AutoMirrored.Filled.List else Icons.AutoMirrored.Outlined.List,
+                    imageVector = if (isReportsSelected) Icons.Filled.Analytics else Icons.Outlined.Analytics,
                     contentDescription = "Reports"
                 )
             },

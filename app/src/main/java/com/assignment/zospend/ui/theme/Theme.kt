@@ -9,6 +9,11 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
@@ -96,4 +101,15 @@ fun ZospendTheme(
         typography = Typography,
         content = content
     )
+}
+
+class ThemeViewModel : ViewModel() {
+    private val _isDarkTheme = MutableStateFlow(false)
+    val isDarkTheme = _isDarkTheme.asStateFlow()
+
+    fun toggleTheme() {
+        viewModelScope.launch {
+            _isDarkTheme.value = !_isDarkTheme.value
+        }
+    }
 }

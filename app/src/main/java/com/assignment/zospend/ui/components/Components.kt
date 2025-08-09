@@ -52,9 +52,7 @@ fun SecondaryButton(
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.primary
         ),
-        border = ButtonDefaults.outlinedButtonBorder.copy(
-            width = 1.dp
-        )
+        border = ButtonDefaults.outlinedButtonBorder(enabled = true)
     ) {
         Text(text = text, style = MaterialTheme.typography.labelLarge)
     }
