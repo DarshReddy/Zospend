@@ -20,17 +20,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,8 +64,15 @@ fun EntryScreen(
     viewModel: EntryViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val duplicateErrorMessage = stringResource(id = R.string.duplicate_expense_error)
+    val isFormValid by remember {
+        derivedStateOf {
+            uiState.amount.isNotBlank() && uiState.title.isNotBlank() && uiState.category != null
+        }
+    }
+    rememberCoroutineScope()
+    LocalContext.current
     var clickedImageUri by remember { mutableStateOf<String?>(null) }
+    val hapticFeedback = LocalHapticFeedback.current
 
     LaunchedEffect(Unit) {
         viewModel.loadExpense(expenseId)
@@ -85,6 +98,7 @@ fun EntryScreen(
     ) {
         if (uiState.isSuccess) {
             SuccessAnimation {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 onNavigateBack()
             }
         } else {
@@ -93,23 +107,26 @@ fun EntryScreen(
                 else stringResource(id = R.string.add_expense_title)
             )
             Spacer(modifier = Modifier.height(24.dp))
-
+            val titleError = stringResource(id = R.string.expense_title_error)
             StyledOutlinedTextField(
                 value = uiState.title,
                 onValueChange = viewModel::onTitleChange,
                 label = { LabelMedium(stringResource(id = R.string.expense_title_label)) },
                 isError = uiState.titleError,
                 singleLine = true,
+                modifier = Modifier.semantics {
+                    if (uiState.titleError) error(titleError)
+                }
             )
             if (uiState.titleError) {
                 BodyRegular(
-                    stringResource(id = R.string.expense_title_error),
+                    titleError,
                     color = MaterialTheme.colorScheme.error
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
+            val amountError = stringResource(id = R.string.expense_amount_error)
             StyledOutlinedTextField(
                 value = uiState.amount,
                 onValueChange = viewModel::onAmountChange,
@@ -118,10 +135,13 @@ fun EntryScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 singleLine = true,
                 prefix = { LabelMedium(NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0]).currency?.symbol.orEmpty()) },
+                modifier = Modifier.semantics {
+                    if (uiState.amountError) error(amountError)
+                }
             )
             if (uiState.amountError) {
                 BodyRegular(
-                    stringResource(id = R.string.expense_amount_error),
+                    amountError,
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -200,16 +220,20 @@ fun EntryScreen(
                 )
                 PrimaryButton(
                     onClick = viewModel::saveExpense,
+                    enabled = isFormValid,
                     text = if (uiState.isEditMode) stringResource(id = R.string.update_expense_button_label)
                     else stringResource(id = R.string.save_expense_button_label)
                 )
             }
 
+            val duplicateErrorMessage = stringResource(id = R.string.duplicate_expense_error)
             AnimatedVisibility(visible = uiState.isDuplicate) {
                 BodyRegular(
                     text = duplicateErrorMessage,
                     color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .semantics { error(duplicateErrorMessage) }
                 )
             }
         }

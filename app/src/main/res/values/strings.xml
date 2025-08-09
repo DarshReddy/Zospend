@@ -30,4 +30,5 @@
     <string name="dialog_content_description">Dialog Image</string>
     <string name="previous_day">Previous Day</string>
     <string name="next_day">Next Day</string>
+    <string name="category_icon_content_description">Category Icon</string>
 </resources>
