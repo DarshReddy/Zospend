@@ -14,7 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,8 +49,10 @@ import com.assignment.zospend.ui.components.TitleSmall
 import com.assignment.zospend.ui.main.ScreenWrapper
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 @Composable
 fun ExpenseListScreen(
@@ -64,11 +71,50 @@ fun ExpenseListScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            TitleLarge(stringResource(id = R.string.all_expenses_title))
+            DateNavigationBar(
+                selectedDate = uiState.selectedDate,
+                onPreviousClick = viewModel::onPreviousDayClicked,
+                onNextClick = viewModel::onNextDayClicked
+            )
             Spacer(Modifier.height(16.dp))
             ExpenseItemsList(
                 expenses = uiState.expenses.values.flatten(),
                 onItemClick = onItemClick
+            )
+        }
+    }
+}
+
+@Composable
+fun DateNavigationBar(
+    selectedDate: LocalDate,
+    onPreviousClick: () -> Unit,
+    onNextClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onPreviousClick) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = stringResource(id = R.string.previous_day)
+            )
+        }
+        TitleLarge(
+            if (selectedDate != LocalDate.now()) {
+                selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+            } else {
+                stringResource(id = R.string.today_expenses_title)
+            },
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+        IconButton(onClick = onNextClick, enabled = selectedDate != LocalDate.now()) {
+            Icon(
+                Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = stringResource(id = R.string.next_day)
             )
         }
     }

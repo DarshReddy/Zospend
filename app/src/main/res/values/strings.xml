@@ -17,7 +17,7 @@
     <string name="save_expense_button_label">Save Expense</string>
     <string name="expense_category_label">Category</string>
     <string name="no_expenses_yet">No expenses yet.\nAdd one to get started!</string>
-    <string name="all_expenses_title">All Expenses</string>
+    <string name="today_expenses_title">Today\'s Expenses</string>
     <string name="toggle_theme_content_description">Toggle Theme</string>
     <string name="export_csv_content_description">Export CSV</string>
     <string name="bottom_nav_today">Today</string>
@@ -28,4 +28,6 @@
     <string name="expense_report_subject">Zospend Expense Report</string>
     <string name="share_report_title">Share Report</string>
     <string name="dialog_content_description">Dialog Image</string>
+    <string name="previous_day">Previous Day</string>
+    <string name="next_day">Next Day</string>
 </resources>

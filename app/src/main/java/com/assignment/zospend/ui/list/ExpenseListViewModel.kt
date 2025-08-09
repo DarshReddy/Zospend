@@ -58,4 +58,12 @@ class ExpenseListViewModel(application: Application) : AndroidViewModel(applicat
             }
         }
     }
+
+    fun onPreviousDayClicked() {
+        _selectedDate.value = _selectedDate.value.minusDays(1)
+    }
+
+    fun onNextDayClicked() {
+        _selectedDate.value = _selectedDate.value.plusDays(1)
+    }
 }
