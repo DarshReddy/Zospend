@@ -75,7 +75,8 @@ fun ReportSummary(total: Long) {
         ) {
             Text("Total for last 7 days", style = MaterialTheme.typography.titleMedium)
             Text(
-                text = formatAmount(total),
+                text = NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
+                    .format(total / 100.0),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -142,7 +143,8 @@ fun CategoryTotals(categoryTotals: Map<Category, Long>) {
                         ) {
                             Text(category.name, style = MaterialTheme.typography.bodyLarge)
                             Text(
-                                formatAmount(total),
+                                NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
+                                    .format(total / 100.0),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.secondary
                             )
@@ -151,13 +153,6 @@ fun CategoryTotals(categoryTotals: Map<Category, Long>) {
             }
         }
     }
-}
-
-
-@Composable
-private fun formatAmount(amount: Long): String {
-    return NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
-        .format(amount / 100.0)
 }
 
 @Preview(showBackground = true)

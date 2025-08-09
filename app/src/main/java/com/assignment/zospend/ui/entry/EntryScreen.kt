@@ -1,4 +1,3 @@
-
 package com.assignment.zospend.ui.entry
 
 import android.widget.Toast
@@ -38,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +48,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.assignment.zospend.domain.model.Category
 import com.assignment.zospend.ui.theme.ZospendTheme
+import java.text.NumberFormat
 
 @Composable
 fun EntryScreen(
@@ -108,7 +109,7 @@ fun EntryScreen(
             isError = uiState.amountError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             singleLine = true,
-            prefix = { Text("₹") },
+            prefix = { Text(NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0]).currency?.symbol.orEmpty()) },
             modifier = Modifier.fillMaxWidth()
         )
         if (uiState.amountError) {
