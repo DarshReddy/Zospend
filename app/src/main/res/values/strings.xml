@@ -1,4 +1,30 @@
 <resources>
     <string name="app_name">Zospend</string>
     <string name="duplicate_expense_error">You have already added this expense.</string>
+    <string name="cancel_button_label">Cancel</string>
+    <string name="todays_total">Today\'s Total: %1$s (%2$d items)</string>
+    <string name="edit_expense_title">Edit Expense</string>
+    <string name="add_expense_title">Add Expense</string>
+    <string name="expense_title_label">Title</string>
+    <string name="expense_title_error">Title cannot be empty</string>
+    <string name="expense_amount_label">Amount (in Rupees)</string>
+    <string name="expense_amount_error">Amount must be a valid number greater than 0</string>
+    <string name="expense_notes_label">Notes (Optional, max 100 chars)</string>
+    <string name="add_receipt_button_label">Add Receipt</string>
+    <string name="change_receipt_button_label">Change Receipt</string>
+    <string name="selected_receipt_content_description">Selected receipt</string>
+    <string name="update_expense_button_label">Update Expense</string>
+    <string name="save_expense_button_label">Save Expense</string>
+    <string name="expense_category_label">Category</string>
+    <string name="no_expenses_yet">No expenses yet.\nAdd one to get started!</string>
+    <string name="all_expenses_title">All Expenses</string>
+    <string name="toggle_theme_content_description">Toggle Theme</string>
+    <string name="export_csv_content_description">Export CSV</string>
+    <string name="bottom_nav_today">Today</string>
+    <string name="bottom_nav_today_content_description">Today</string>
+    <string name="bottom_nav_reports">Reports</string>
+    <string name="bottom_nav_reports_content_description">Reports</string>
+    <string name="add_expense_content_description">Add Expense</string>
+    <string name="expense_report_subject">Zospend Expense Report</string>
+    <string name="share_report_title">Share Report</string>
 </resources>

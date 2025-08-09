@@ -88,19 +88,25 @@ fun EntryScreen(
                 onNavigateBack()
             }
         } else {
-            TitleLarge(if (uiState.isEditMode) "Edit Expense" else "Add Expense")
+            TitleLarge(
+                if (uiState.isEditMode) stringResource(id = R.string.edit_expense_title)
+                else stringResource(id = R.string.add_expense_title)
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
                 value = uiState.title,
                 onValueChange = viewModel::onTitleChange,
-                label = { LabelMedium("Title") },
+                label = { LabelMedium(stringResource(id = R.string.expense_title_label)) },
                 isError = uiState.titleError,
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
             if (uiState.titleError) {
-                BodyRegular("Title cannot be empty", color = MaterialTheme.colorScheme.error)
+                BodyRegular(
+                    stringResource(id = R.string.expense_title_error),
+                    color = MaterialTheme.colorScheme.error
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -108,7 +114,7 @@ fun EntryScreen(
             OutlinedTextField(
                 value = uiState.amount,
                 onValueChange = viewModel::onAmountChange,
-                label = { LabelMedium("Amount (in Rupees)") },
+                label = { LabelMedium(stringResource(id = R.string.expense_amount_label)) },
                 isError = uiState.amountError,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 singleLine = true,
@@ -117,7 +123,7 @@ fun EntryScreen(
             )
             if (uiState.amountError) {
                 BodyRegular(
-                    "Amount must be a valid number greater than 0",
+                    stringResource(id = R.string.expense_amount_error),
                     color = MaterialTheme.colorScheme.error,
                 )
             }
@@ -134,7 +140,7 @@ fun EntryScreen(
             OutlinedTextField(
                 value = uiState.note,
                 onValueChange = viewModel::onNoteChange,
-                label = { LabelMedium("Notes (Optional, max 100 chars)") },
+                label = { LabelMedium(stringResource(id = R.string.expense_notes_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp)
@@ -156,7 +162,8 @@ fun EntryScreen(
                             )
                         )
                     },
-                    text = if (uiState.selectedReceiptUri == null) "Add Receipt" else "Change Receipt"
+                    text = if (uiState.selectedReceiptUri == null) stringResource(id = R.string.add_receipt_button_label)
+                    else stringResource(id = R.string.change_receipt_button_label)
                 )
 
                 if (uiState.selectedReceiptUri != null) {
@@ -167,7 +174,7 @@ fun EntryScreen(
                                 .crossfade(true)
                                 .build()
                         ),
-                        contentDescription = "Selected receipt",
+                        contentDescription = stringResource(id = R.string.selected_receipt_content_description),
                         modifier = Modifier.size(64.dp),
                         contentScale = ContentScale.Crop
                     )
@@ -184,14 +191,15 @@ fun EntryScreen(
                     onClick = {
                         onNavigateBack()
                     },
-                    text = "Cancel",
+                    text = stringResource(id = R.string.cancel_button_label),
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .fillMaxWidth(0.5f)
                 )
                 PrimaryButton(
                     onClick = viewModel::saveExpense,
-                    text = if (uiState.isEditMode) "Update Expense" else "Save Expense"
+                    text = if (uiState.isEditMode) stringResource(id = R.string.update_expense_button_label)
+                    else stringResource(id = R.string.save_expense_button_label)
                 )
             }
 
@@ -246,7 +254,7 @@ fun CategoryDropDown(
             readOnly = true,
             value = selectedCategory.name,
             onValueChange = {},
-            label = { LabelMedium("Category") },
+            label = { LabelMedium(stringResource(id = R.string.expense_category_label)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
