@@ -33,7 +33,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.assignment.zospend.domain.model.Expense
+import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.ui.components.BodyLarge
 import com.assignment.zospend.ui.components.BodySmall
 import com.assignment.zospend.ui.components.TitleLarge

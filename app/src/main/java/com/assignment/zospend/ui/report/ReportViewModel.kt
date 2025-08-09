@@ -1,6 +1,7 @@
 package com.assignment.zospend.ui.report
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
 import com.assignment.zospend.domain.model.Category
@@ -24,10 +25,10 @@ data class DailyTotal(
     val total: Long
 )
 
-class ReportViewModel() : ViewModel() {
+class ReportViewModel(application: Application) : AndroidViewModel(application) {
 
-    val expenseRepository = ServiceLocator.provideRepository()
-    val uiState: StateFlow<ReportUiState> = expenseRepository.expenses
+    val expenseRepository = ServiceLocator.provideRepository(application)
+    val uiState: StateFlow<ReportUiState> = expenseRepository.allExpenses()
         .map { expenses ->
             val sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS)
             val recentExpenses = expenses.filter { it.createdAt.isAfter(sevenDaysAgo) }

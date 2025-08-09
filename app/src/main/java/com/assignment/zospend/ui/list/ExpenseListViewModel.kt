@@ -1,10 +1,11 @@
 package com.assignment.zospend.ui.list
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
+import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.domain.model.Category
-import com.assignment.zospend.domain.model.Expense
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,8 +24,8 @@ data class ExpenseListUiState(
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ExpenseListViewModel() : ViewModel() {
-    val repository = ServiceLocator.provideRepository()
+class ExpenseListViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = ServiceLocator.provideRepository(application)
     private val _selectedDate = MutableStateFlow(LocalDate.now())
     private val _isGroupedByCategory = MutableStateFlow(false)
 
@@ -56,13 +57,5 @@ class ExpenseListViewModel() : ViewModel() {
                 _uiState.value = it
             }
         }
-    }
-
-    fun onDateSelected(date: LocalDate) {
-        _selectedDate.value = date
-    }
-
-    fun onGroupingToggled(isGrouped: Boolean) {
-        _isGroupedByCategory.value = isGrouped
     }
 }

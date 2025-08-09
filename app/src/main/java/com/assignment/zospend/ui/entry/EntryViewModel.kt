@@ -1,14 +1,16 @@
 
 package com.assignment.zospend.ui.entry
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
+import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.domain.model.Category
-import com.assignment.zospend.domain.model.Expense
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 data class EntryUiState(
     val title: String = "",
@@ -21,9 +23,9 @@ data class EntryUiState(
     val addExpenseResult: Result<Unit>? = null
 )
 
-class EntryViewModel() : ViewModel() {
+class EntryViewModel(application: Application) : AndroidViewModel(application) {
 
-    val repository = ServiceLocator.provideRepository()
+    private val repository = ServiceLocator.provideRepository(application)
     private val _uiState = MutableStateFlow(EntryUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -77,7 +79,8 @@ class EntryViewModel() : ViewModel() {
             amount = amountInPaise,
             category = _uiState.value.category,
             note = _uiState.value.note.takeIf { it.isNotBlank() },
-            receiptUri = _uiState.value.selectedReceiptUri
+            receiptUri = _uiState.value.selectedReceiptUri,
+            createdAt = Instant.now()
         )
 
         viewModelScope.launch {

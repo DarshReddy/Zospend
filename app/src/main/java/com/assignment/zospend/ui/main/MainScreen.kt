@@ -60,7 +60,7 @@ fun MainScreen(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    val reportViewModel = viewModel { ReportViewModel() }
+    val reportViewModel: ReportViewModel = viewModel()
     val reportState by reportViewModel.uiState.collectAsState()
     val context = LocalContext.current
 
