@@ -27,4 +27,5 @@
     <string name="add_expense_content_description">Add Expense</string>
     <string name="expense_report_subject">Zospend Expense Report</string>
     <string name="share_report_title">Share Report</string>
+    <string name="dialog_content_description">Dialog Image</string>
 </resources>

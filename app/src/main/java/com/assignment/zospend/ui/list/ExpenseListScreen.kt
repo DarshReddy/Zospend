@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -39,6 +38,7 @@ import com.assignment.zospend.R
 import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.ui.components.BodyLarge
 import com.assignment.zospend.ui.components.BodySmall
+import com.assignment.zospend.ui.components.ImageDialog
 import com.assignment.zospend.ui.components.TitleLarge
 import com.assignment.zospend.ui.components.TitleSmall
 import com.assignment.zospend.ui.main.ScreenWrapper
@@ -95,16 +95,7 @@ private fun ExpenseItemsList(
     }
 
     if (selectedImageUri != null) {
-        Dialog(onDismissRequest = { selectedImageUri = null }) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(selectedImageUri)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = stringResource(id = R.string.selected_receipt_content_description),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        ImageDialog(selectedImageUri.toString(), onDismiss = { selectedImageUri = null })
     }
 }
 
