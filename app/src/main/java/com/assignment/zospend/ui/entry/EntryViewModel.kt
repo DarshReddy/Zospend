@@ -1,42 +1,40 @@
+
 package com.assignment.zospend.ui.entry
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.assignment.zospend.data.ServiceLocator
 import com.assignment.zospend.domain.model.Category
 import com.assignment.zospend.domain.model.Expense
+import com.assignment.zospend.domain.repo.ExpenseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 data class EntryUiState(
     val title: String = "",
     val amount: String = "",
     val category: Category = Category.FOOD,
-    val note: String? = null,
-    val receiptUri: String? = null,
+    val note: String = "",
+    val selectedReceiptUri: String? = null,
     val titleError: Boolean = false,
     val amountError: Boolean = false,
     val addExpenseResult: Result<Unit>? = null
 )
 
-class EntryViewModel() : ViewModel() {
+class EntryViewModel(private val repository: ExpenseRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EntryUiState())
     val uiState = _uiState.asStateFlow()
-
-    val repository = ServiceLocator.provideRepository()
-    val totalSpentToday = repository.totalOn(LocalDate.now())
-        .map { it / 100.0 } // Convert paise to rupees
 
     fun onTitleChange(newTitle: String) {
         _uiState.value = _uiState.value.copy(title = newTitle, titleError = false)
     }
 
     fun onAmountChange(newAmount: String) {
-        _uiState.value = _uiState.value.copy(amount = newAmount, amountError = false)
+        // Allow only digits
+        if (newAmount.all { it.isDigit() }) {
+            _uiState.value = _uiState.value.copy(amount = newAmount, amountError = false)
+        }
     }
 
     fun onCategoryChange(newCategory: Category) {
@@ -44,11 +42,13 @@ class EntryViewModel() : ViewModel() {
     }
 
     fun onNoteChange(newNote: String) {
-        _uiState.value = _uiState.value.copy(note = newNote)
+        if (newNote.length <= 100) {
+            _uiState.value = _uiState.value.copy(note = newNote)
+        }
     }
 
     fun onReceiptSelected(uri: String?) {
-        _uiState.value = _uiState.value.copy(receiptUri = uri)
+        _uiState.value = _uiState.value.copy(selectedReceiptUri = uri)
     }
 
     fun onAddExpenseResultConsumed() {
@@ -58,32 +58,33 @@ class EntryViewModel() : ViewModel() {
     fun addExpense() {
         val title = _uiState.value.title.trim()
         val amountStr = _uiState.value.amount.trim()
+        val amountLong = amountStr.toLongOrNull()
 
-        val hasError = title.isEmpty() || amountStr.toDoubleOrNull()?.let { it <= 0 } ?: true
+        val hasError = title.isEmpty() || amountLong == null || amountLong <= 0
         if (hasError) {
             _uiState.value = _uiState.value.copy(
                 titleError = title.isEmpty(),
-                amountError = amountStr.toDoubleOrNull()?.let { it <= 0 } ?: true
+                amountError = amountLong == null || amountLong <= 0
             )
             return
         }
 
-        val amountInPaise = (amountStr.toDouble() * 100).toLong()
+        val amountInPaise = amountLong * 100
 
         val newExpense = Expense(
             title = title,
             amount = amountInPaise,
             category = _uiState.value.category,
-            note = _uiState.value.note?.takeIf { it.isNotBlank() },
-            receiptUri = _uiState.value.receiptUri
+            note = _uiState.value.note.takeIf { it.isNotBlank() },
+            receiptUri = _uiState.value.selectedReceiptUri
         )
 
         viewModelScope.launch {
             val result = repository.add(newExpense)
             _uiState.value = _uiState.value.copy(addExpenseResult = result)
             if (result.isSuccess) {
-                // Clear form on success
-                _uiState.value = EntryUiState(category = _uiState.value.category) // Keep category
+                // Clear form on success, keep category
+                _uiState.value = EntryUiState(category = _uiState.value.category)
             }
         }
     }

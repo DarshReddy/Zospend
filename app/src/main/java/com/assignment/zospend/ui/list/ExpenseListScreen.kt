@@ -1,8 +1,5 @@
 package com.assignment.zospend.ui.list
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,24 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -39,8 +26,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.assignment.zospend.domain.model.Expense
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
-import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -48,16 +33,12 @@ import java.util.Locale
 @Composable
 fun ExpenseListScreen(viewModel: ExpenseListViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
-    var showDatePicker by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        ControlsHeader(
-            selectedDate = uiState.selectedDate,
-            isGrouped = uiState.isGroupedByCategory,
-            onDateClicked = { showDatePicker = true },
-            onGroupingToggled = viewModel::onGroupingToggled
-        )
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         SummaryHeader(
             totalAmount = uiState.totalAmount,
             totalCount = uiState.totalCount
@@ -67,47 +48,8 @@ fun ExpenseListScreen(viewModel: ExpenseListViewModel = viewModel()) {
             EmptyState()
         } else {
             ExpenseItemsList(
-                expensesMap = uiState.expenses,
-                isGrouped = uiState.isGroupedByCategory
+                expenses = uiState.expenses.values.flatten()
             )
-        }
-    }
-
-    if (showDatePicker) {
-        ExpenseDatePickerDialog(
-            initialDate = uiState.selectedDate,
-            onDateSelected = {
-                viewModel.onDateSelected(it)
-                showDatePicker = false
-            },
-            onDismiss = { showDatePicker = false }
-        )
-    }
-}
-
-@Composable
-private fun ControlsHeader(
-    selectedDate: LocalDate,
-    isGrouped: Boolean,
-    onDateClicked: () -> Unit,
-    onGroupingToggled: (Boolean) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = selectedDate.format(DateTimeFormatter.ofPattern("dd MMMM yyyy")),
-            modifier = Modifier.clickable(onClick = onDateClicked),
-            style = MaterialTheme.typography.titleMedium
-        )
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Group by Category", style = MaterialTheme.typography.bodySmall)
-            Spacer(Modifier.width(8.dp))
-            Switch(checked = isGrouped, onCheckedChange = onGroupingToggled)
         }
     }
 }
@@ -117,44 +59,23 @@ private fun SummaryHeader(totalAmount: Long, totalCount: Int) {
     val formattedAmount =
         NumberFormat.getCurrencyInstance(Locale("en", "IN")).format(totalAmount / 100.0)
     Text(
-        text = "Total: $formattedAmount ($totalCount items)",
-        modifier = Modifier.padding(horizontal = 16.dp),
-        style = MaterialTheme.typography.bodyLarge,
+        text = "Today's Total: $formattedAmount ($totalCount items)",
+        style = MaterialTheme.typography.headlineSmall,
         fontWeight = FontWeight.Bold
     )
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(16.dp))
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ExpenseItemsList(expensesMap: Map<out Any, List<Expense>>, isGrouped: Boolean) {
+private fun ExpenseItemsList(expenses: List<Expense>) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        expensesMap.forEach { (header, expenses) ->
-            if (isGrouped) {
-                stickyHeader {
-                    CategoryHeader(name = header.toString())
-                }
-            }
-            items(expenses, key = { it.id }) { expense ->
-                ExpenseItem(
-                    expense = expense,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                )
-            }
+        items(expenses, key = { it.id }) { expense ->
+            ExpenseItem(
+                expense = expense,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
         }
     }
-}
-
-@Composable
-private fun CategoryHeader(name: String) {
-    Text(
-        text = name,
-        style = MaterialTheme.typography.titleSmall,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-    )
 }
 
 @Composable
@@ -164,7 +85,8 @@ private fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -175,6 +97,11 @@ private fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
                 if (!expense.note.isNullOrEmpty()) {
                     Text(expense.note, style = MaterialTheme.typography.bodySmall)
                 }
+                Text(
+                    expense.createdAt.atZone(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern("hh:mm a")),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
             Text(
                 text = NumberFormat.getCurrencyInstance(Locale("en", "IN"))
@@ -188,38 +115,7 @@ private fun ExpenseItem(expense: Expense, modifier: Modifier = Modifier) {
 @Composable
 private fun EmptyState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("No expenses for this day. Add one from the Entry screen!")
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ExpenseDatePickerDialog(
-    initialDate: LocalDate,
-    onDateSelected: (LocalDate) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
-            .toEpochMilli()
-    )
-    DatePickerDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    datePickerState.selectedDateMillis?.let {
-                        onDateSelected(
-                            Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
-                        )
-                    }
-                },
-                enabled = datePickerState.selectedDateMillis != null
-            ) { Text("OK") }
-        },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
-    ) {
-        DatePicker(state = datePickerState)
+        Text("No expenses today. Tap the + button to add one!")
     }
 }
 
@@ -227,6 +123,6 @@ private fun ExpenseDatePickerDialog(
 @Composable
 fun ExpenseListScreenPreview() {
     ZospendTheme {
-        ExpenseListScreen(viewModel())
+        ExpenseListScreen()
     }
 }
