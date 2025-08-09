@@ -1,0 +1,64 @@
+package com.assignment.zospend.ui.report
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.assignment.zospend.data.ServiceLocator
+import com.assignment.zospend.domain.model.Category
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
+
+data class ReportUiState(
+    val dailyTotals: List<DailyTotal> = emptyList(),
+    val categoryTotals: Map<Category, Long> = emptyMap(),
+    val last7DaysTotal: Long = 0L
+)
+
+data class DailyTotal(
+    val date: LocalDate,
+    val total: Long
+)
+
+class ReportViewModel() : ViewModel() {
+
+    val expenseRepository = ServiceLocator.provideRepository()
+    val uiState: StateFlow<ReportUiState> = expenseRepository.expenses
+        .map { expenses ->
+            val sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS)
+            val recentExpenses = expenses.filter { it.createdAt.isAfter(sevenDaysAgo) }
+
+            // Calculate daily totals for the last 7 days
+            val today = LocalDate.now()
+            val last7Days = (0..6).map { today.minusDays(it.toLong()) }
+            val dailyTotalsMap = recentExpenses
+                .groupBy { it.createdAt.atZone(ZoneId.systemDefault()).toLocalDate() }
+                .mapValues { (_, exps) -> exps.sumOf { it.amount } }
+
+            val dailyTotals = last7Days.map { date ->
+                DailyTotal(date, dailyTotalsMap[date] ?: 0L)
+            }.reversed() // Reverse to have the oldest day first for charting
+
+            // Calculate category totals for the last 7 days
+            val categoryTotals = recentExpenses
+                .groupBy { it.category }
+                .mapValues { (_, exps) -> exps.sumOf { it.amount } }
+
+            val last7DaysTotal = recentExpenses.sumOf { it.amount }
+
+            ReportUiState(
+                dailyTotals = dailyTotals,
+                categoryTotals = categoryTotals,
+                last7DaysTotal = last7DaysTotal
+            )
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ReportUiState()
+        )
+}

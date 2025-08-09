@@ -1,3 +1,4 @@
+
 package com.assignment.zospend.ui.navigation
 
 import androidx.compose.runtime.Composable
@@ -19,7 +20,7 @@ object AppDestinations {
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: String = AppDestinations.ENTRY_ROUTE
+    startDestination: String = AppDestinations.ENTRY_ROUTE,
 ) {
     NavHost(
         modifier = modifier,
