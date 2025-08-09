@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -121,11 +123,19 @@ fun AppBottomBar(
     navController: NavController,
     currentRoute: String?
 ) {
+    val isTodaySelected = currentRoute == Screen.Today.route
+    val isReportsSelected = currentRoute == Screen.Reports.route
+
     BottomAppBar {
         NavigationBarItem(
-            icon = { Icon(Icons.Default.DateRange, contentDescription = "Today") },
+            icon = {
+                Icon(
+                    imageVector = if (isTodaySelected) Icons.Filled.DateRange else Icons.Outlined.DateRange,
+                    contentDescription = "Today"
+                )
+            },
             label = { Text("Today") },
-            selected = currentRoute == Screen.Today.route,
+            selected = isTodaySelected,
             onClick = {
                 navController.navigate(Screen.Today.route) {
                     popUpTo(navController.graph.startDestinationId)
@@ -134,9 +144,14 @@ fun AppBottomBar(
             }
         )
         NavigationBarItem(
-            icon = { Icon(Icons.AutoMirrored.Default.List, contentDescription = "Reports") },
+            icon = {
+                Icon(
+                    imageVector = if (isReportsSelected) Icons.AutoMirrored.Filled.List else Icons.AutoMirrored.Outlined.List,
+                    contentDescription = "Reports"
+                )
+            },
             label = { Text("Reports") },
-            selected = currentRoute == Screen.Reports.route,
+            selected = isReportsSelected,
             onClick = {
                 navController.navigate(Screen.Reports.route) {
                     popUpTo(navController.graph.startDestinationId)

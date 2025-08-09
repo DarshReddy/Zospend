@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,7 +32,6 @@ import com.assignment.zospend.domain.model.Category
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
@@ -102,7 +103,7 @@ fun DailyBarChart(dailyTotals: List<DailyTotal>) {
                 drawRect(
                     color = barColor,
                     topLeft = Offset(x = startX, y = size.height - barHeight),
-                    size = androidx.compose.ui.geometry.Size(barWidth, barHeight)
+                    size = Size(barWidth, barHeight)
                 )
             }
         }
@@ -153,8 +154,10 @@ fun CategoryTotals(categoryTotals: Map<Category, Long>) {
 }
 
 
+@Composable
 private fun formatAmount(amount: Long): String {
-    return NumberFormat.getCurrencyInstance(Locale("en", "IN")).format(amount / 100.0)
+    return NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
+        .format(amount / 100.0)
 }
 
 @Preview(showBackground = true)
