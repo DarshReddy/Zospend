@@ -56,28 +56,25 @@ import com.assignment.zospend.ui.components.PrimaryButton
 import com.assignment.zospend.ui.components.SecondaryButton
 import com.assignment.zospend.ui.components.TitleLarge
 import com.assignment.zospend.ui.theme.ZospendTheme
-import kotlinx.coroutines.delay
 import java.text.NumberFormat
 
 @Composable
 fun EntryScreen(
-    onDismiss: () -> Unit,
+    expenseId: Long = -1,
+    onNavigateBack: () -> Unit,
     viewModel: EntryViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val duplicateErrorMessage = stringResource(id = R.string.duplicate_expense_error)
 
+    LaunchedEffect(Unit) {
+        viewModel.loadExpense(expenseId)
+    }
+
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         viewModel.onReceiptSelected(uri?.toString())
-    }
-
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            delay(2000) // Show animation for 2 seconds
-            onDismiss()
-        }
     }
 
     Column(
@@ -88,10 +85,10 @@ fun EntryScreen(
     ) {
         if (uiState.isSuccess) {
             SuccessAnimation {
-                onDismiss()
+                onNavigateBack()
             }
         } else {
-            TitleLarge("Add Expense")
+            TitleLarge(if (uiState.isEditMode) "Edit Expense" else "Add Expense")
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
@@ -185,8 +182,7 @@ fun EntryScreen(
             ) {
                 SecondaryButton(
                     onClick = {
-                        viewModel.onAddExpenseResultConsumed()
-                        onDismiss()
+                        onNavigateBack()
                     },
                     text = "Cancel",
                     modifier = Modifier
@@ -194,8 +190,8 @@ fun EntryScreen(
                         .fillMaxWidth(0.5f)
                 )
                 PrimaryButton(
-                    onClick = viewModel::addExpense,
-                    text = "Save Expense"
+                    onClick = viewModel::saveExpense,
+                    text = if (uiState.isEditMode) "Update Expense" else "Save Expense"
                 )
             }
 
@@ -276,6 +272,6 @@ fun CategoryDropDown(
 @Composable
 fun EntryScreenPreview() {
     ZospendTheme {
-        EntryScreen(onDismiss = {})
+        EntryScreen(expenseId = -1, onNavigateBack = {})
     }
 }

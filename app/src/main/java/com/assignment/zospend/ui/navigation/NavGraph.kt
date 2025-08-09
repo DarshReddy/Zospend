@@ -5,12 +5,28 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
+import androidx.navigation.toRoute
+import com.assignment.zospend.ui.entry.EntryScreen
 import com.assignment.zospend.ui.list.ExpenseListScreen
 import com.assignment.zospend.ui.report.ReportScreen
+import kotlinx.serialization.Serializable
 
-sealed class Screen(val route: String) {
-    object Today : Screen("today")
-    object Reports : Screen("reports")
+sealed interface BottomNavItems {
+    @Serializable
+    data object Today : BottomNavItems
+
+    @Serializable
+    data object Reports : BottomNavItems
+}
+
+@Serializable
+sealed interface Screen {
+    @Serializable
+    data object BottomNav : Screen
+
+    @Serializable
+    data class Entry(val expenseId: Long = -1) : Screen
 }
 
 @Composable
@@ -20,14 +36,27 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Today.route,
+        startDestination = Screen.BottomNav,
         modifier = modifier
     ) {
-        composable(Screen.Today.route) {
-            ExpenseListScreen()
+        navigation<Screen.BottomNav>(startDestination = BottomNavItems.Today) {
+            composable<BottomNavItems.Today> {
+                ExpenseListScreen(
+                    onItemClick = {
+                        navController.navigate(Screen.Entry(it))
+                    }
+                )
+            }
+            composable<BottomNavItems.Reports> {
+                ReportScreen()
+            }
         }
-        composable(Screen.Reports.route) {
-            ReportScreen()
+        composable<Screen.Entry> {
+            val args = it.toRoute<Screen.Entry>()
+            EntryScreen(
+                expenseId = args.expenseId,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

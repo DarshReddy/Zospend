@@ -22,4 +22,15 @@ class RoomExpenseRepository(private val expenseDao: ExpenseDao) : ExpenseReposit
             Result.failure(e)
         }
     }
+
+    override suspend fun update(expense: Expense): Result<Unit> {
+        return try {
+            expenseDao.updateExpense(expense)
+            Result.success(Unit)
+        } catch (e: SQLiteConstraintException) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getExpenseById(id: Long) = expenseDao.getExpenseById(id)
 }

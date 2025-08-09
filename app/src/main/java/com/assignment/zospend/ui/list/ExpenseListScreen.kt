@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.assignment.zospend.R
 import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.ui.components.BodyLarge
 import com.assignment.zospend.ui.components.BodySmall
@@ -44,7 +46,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun ExpenseListScreen(viewModel: ExpenseListViewModel = viewModel()) {
+fun ExpenseListScreen(
+    viewModel: ExpenseListViewModel = viewModel(),
+    onItemClick: (Long) -> Unit = {}
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     Column(
@@ -61,7 +66,8 @@ fun ExpenseListScreen(viewModel: ExpenseListViewModel = viewModel()) {
             EmptyState()
         } else {
             ExpenseItemsList(
-                expenses = uiState.expenses.values.flatten()
+                expenses = uiState.expenses.values.flatten(),
+                onItemClick = onItemClick
             )
         }
     }
@@ -77,7 +83,10 @@ private fun SummaryHeader(totalAmount: Long, totalCount: Int) {
 }
 
 @Composable
-private fun ExpenseItemsList(expenses: List<Expense>) {
+private fun ExpenseItemsList(
+    expenses: List<Expense>,
+    onItemClick: (Long) -> Unit
+) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -87,6 +96,7 @@ private fun ExpenseItemsList(expenses: List<Expense>) {
                 onReceiptClick = { uri ->
                     selectedImageUri = uri
                 },
+                onItemClick = { onItemClick(expense.id) },
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         }
@@ -110,9 +120,10 @@ private fun ExpenseItemsList(expenses: List<Expense>) {
 private fun ExpenseItem(
     expense: Expense,
     onReceiptClick: (Uri) -> Unit,
+    onItemClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(modifier = modifier) {
+    Card(modifier = modifier.clickable(onClick = onItemClick)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,6 +150,7 @@ private fun ExpenseItem(
                         .data(uri)
                         .crossfade(true)
                         .build(),
+                    error = painterResource(id = R.drawable.ic_broken_image),
                     contentDescription = "Receipt thumbnail",
                     modifier = Modifier
                         .size(48.dp)

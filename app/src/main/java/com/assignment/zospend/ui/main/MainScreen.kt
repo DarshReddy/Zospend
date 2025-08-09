@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.assignment.zospend.domain.model.Category
@@ -43,7 +44,7 @@ import com.assignment.zospend.ui.components.LabelMedium
 import com.assignment.zospend.ui.components.TitleRegular
 import com.assignment.zospend.ui.entry.EntryScreen
 import com.assignment.zospend.ui.navigation.AppNavHost
-import com.assignment.zospend.ui.navigation.Screen
+import com.assignment.zospend.ui.navigation.BottomNavItems
 import com.assignment.zospend.ui.report.DailyTotal
 import com.assignment.zospend.ui.report.ReportViewModel
 import com.assignment.zospend.utils.CsvUtils
@@ -65,7 +66,9 @@ fun MainScreen(
     val context = LocalContext.current
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    val isTodaySelected = navBackStackEntry?.destination?.hasRoute<BottomNavItems.Today>() == true
+    val isReportsSelected =
+        navBackStackEntry?.destination?.hasRoute<BottomNavItems.Reports>() == true
 
     Scaffold(
         topBar = {
@@ -78,7 +81,7 @@ fun MainScreen(
                             contentDescription = "Toggle Theme"
                         )
                     }
-                    AnimatedVisibility(visible = currentRoute == Screen.Reports.route) {
+                    AnimatedVisibility(visible = isReportsSelected) {
                         IconButton(onClick = {
                             shareReport(
                                 context,
@@ -95,11 +98,12 @@ fun MainScreen(
         bottomBar = {
             AppBottomBar(
                 navController = navController,
-                currentRoute = currentRoute
+                isTodaySelected = isTodaySelected,
+                isReportsSelected = isReportsSelected
             )
         },
         floatingActionButton = {
-            if (currentRoute == Screen.Today.route) {
+            if (isTodaySelected) {
                 FloatingActionButton(onClick = { showBottomSheet = true }) {
                     Icon(Icons.Default.Add, contentDescription = "Add Expense")
                 }
@@ -117,7 +121,7 @@ fun MainScreen(
                 modifier = Modifier.padding(top = 24.dp)
             ) {
                 EntryScreen(
-                    onDismiss = {
+                    onNavigateBack = {
                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                             if (!sheetState.isVisible) {
                                 showBottomSheet = false
@@ -133,11 +137,9 @@ fun MainScreen(
 @Composable
 fun AppBottomBar(
     navController: NavController,
-    currentRoute: String?
+    isTodaySelected: Boolean,
+    isReportsSelected: Boolean
 ) {
-    val isTodaySelected = currentRoute == Screen.Today.route
-    val isReportsSelected = currentRoute == Screen.Reports.route
-
     BottomAppBar {
         NavigationBarItem(
             icon = {
@@ -149,7 +151,7 @@ fun AppBottomBar(
             label = { LabelMedium("Today") },
             selected = isTodaySelected,
             onClick = {
-                navController.navigate(Screen.Today.route) {
+                navController.navigate(BottomNavItems.Today) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }
@@ -165,7 +167,7 @@ fun AppBottomBar(
             label = { LabelMedium("Reports") },
             selected = isReportsSelected,
             onClick = {
-                navController.navigate(Screen.Reports.route) {
+                navController.navigate(BottomNavItems.Reports) {
                     popUpTo(navController.graph.startDestinationId)
                     launchSingleTop = true
                 }
