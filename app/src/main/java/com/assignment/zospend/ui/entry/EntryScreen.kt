@@ -45,7 +45,6 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.assignment.zospend.R
@@ -229,7 +228,7 @@ fun SuccessAnimation(onDismiss: () -> Unit) {
     }
     LottieAnimation(
         composition = composition,
-        iterations = LottieConstants.IterateForever,
+        iterations = 1,
         modifier = Modifier.fillMaxWidth()
     )
 }

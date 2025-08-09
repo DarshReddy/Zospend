@@ -32,6 +32,7 @@ import com.assignment.zospend.ui.components.BodySmall
 import com.assignment.zospend.ui.components.LabelMedium
 import com.assignment.zospend.ui.components.LabelSmall
 import com.assignment.zospend.ui.components.TitleRegular
+import com.assignment.zospend.ui.main.ScreenWrapper
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
@@ -40,17 +41,11 @@ import java.time.format.DateTimeFormatter
 fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
     val uiState by viewModel.uiState.collectAsState()
 
-    if (uiState.dailyTotals.isEmpty() || uiState.last7DaysTotal == 0L) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            BodyRegular(
-                "No expense data available for the last 7 days.",
-                textAlign = TextAlign.Center
-            )
-        }
-    } else {
+    ScreenWrapper(
+        isLoading = uiState.isLoading,
+        isEmpty = uiState.dailyTotals.isEmpty() || uiState.last7DaysTotal == 0L,
+        emptyContent = { EmptyState() }
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -155,6 +150,13 @@ fun CategoryTotals(categoryTotals: Map<Category, Long>) {
                     }
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyState() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        BodyRegular("No expense data available for the last 7 days.", textAlign = TextAlign.Center)
     }
 }
 

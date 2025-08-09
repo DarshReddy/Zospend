@@ -17,7 +17,8 @@ import java.time.temporal.ChronoUnit
 data class ReportUiState(
     val dailyTotals: List<DailyTotal> = emptyList(),
     val categoryTotals: Map<Category, Long> = emptyMap(),
-    val last7DaysTotal: Long = 0L
+    val last7DaysTotal: Long = 0L,
+    val isLoading: Boolean = false
 )
 
 data class DailyTotal(
@@ -54,12 +55,13 @@ class ReportViewModel(application: Application) : AndroidViewModel(application) 
             ReportUiState(
                 dailyTotals = dailyTotals,
                 categoryTotals = categoryTotals,
-                last7DaysTotal = last7DaysTotal
+                last7DaysTotal = last7DaysTotal,
+                isLoading = false
             )
         }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ReportUiState()
+            initialValue = ReportUiState(isLoading = true)
         )
 }

@@ -20,7 +20,8 @@ data class ExpenseListUiState(
     val selectedDate: LocalDate = LocalDate.now(),
     val isGroupedByCategory: Boolean = false,
     val totalAmount: Long = 0,
-    val totalCount: Int = 0
+    val totalCount: Int = 0,
+    val isLoading: Boolean = true
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -42,8 +43,6 @@ class ExpenseListViewModel(application: Application) : AndroidViewModel(applicat
                 val groupedExpenses = if (isGrouped) {
                     expenses.groupBy { it.category }
                 } else {
-                    // When not grouped, we can put all items under a "dummy" category
-                    // or handle it differently in the UI. Grouping is easier.
                     mapOf(Category.FOOD to expenses.sortedByDescending { it.createdAt })
                 }
                 ExpenseListUiState(
@@ -51,7 +50,8 @@ class ExpenseListViewModel(application: Application) : AndroidViewModel(applicat
                     selectedDate = _selectedDate.value,
                     isGroupedByCategory = isGrouped,
                     totalAmount = totalAmount,
-                    totalCount = expenses.size
+                    totalCount = expenses.size,
+                    isLoading = false
                 )
             }.collect {
                 _uiState.value = it

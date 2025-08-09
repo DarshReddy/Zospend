@@ -37,7 +37,10 @@ class EntryViewModel(application: Application) : AndroidViewModel(application) {
     private val contentResolver = application.contentResolver
 
     fun loadExpense(expenseId: Long) {
-        if (expenseId == -1L) return
+        if (expenseId == -1L) {
+            _uiState.value = EntryUiState()
+            return
+        }
         viewModelScope.launch {
             val expense = repository.getExpenseById(expenseId)
             if (expense != null) {

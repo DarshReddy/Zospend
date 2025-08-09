@@ -41,6 +41,7 @@ import com.assignment.zospend.ui.components.BodyLarge
 import com.assignment.zospend.ui.components.BodySmall
 import com.assignment.zospend.ui.components.TitleLarge
 import com.assignment.zospend.ui.components.TitleSmall
+import com.assignment.zospend.ui.main.ScreenWrapper
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
 import java.time.ZoneId
@@ -53,14 +54,16 @@ fun ExpenseListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+    ScreenWrapper(
+        isLoading = uiState.isLoading,
+        isEmpty = uiState.expenses.isEmpty(),
+        emptyContent = { EmptyState() }
     ) {
-        if (uiState.expenses.isEmpty()) {
-            EmptyState()
-        } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
             TitleLarge(stringResource(id = R.string.all_expenses_title))
             Spacer(Modifier.height(16.dp))
             ExpenseItemsList(
