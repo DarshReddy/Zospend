@@ -61,22 +61,22 @@ fun ExpenseListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    ScreenWrapper(
-        isLoading = uiState.isLoading,
-        isEmpty = uiState.expenses.isEmpty(),
-        emptyContent = { EmptyState() }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+        DateNavigationBar(
+            selectedDate = uiState.selectedDate,
+            onPreviousClick = viewModel::onPreviousDayClicked,
+            onNextClick = viewModel::onNextDayClicked
+        )
+        Spacer(Modifier.height(16.dp))
+        ScreenWrapper(
+            isLoading = uiState.isLoading,
+            isEmpty = uiState.expenses.isEmpty(),
+            emptyContent = { EmptyState() }
         ) {
-            DateNavigationBar(
-                selectedDate = uiState.selectedDate,
-                onPreviousClick = viewModel::onPreviousDayClicked,
-                onNextClick = viewModel::onNextDayClicked
-            )
-            Spacer(Modifier.height(16.dp))
             ExpenseItemsList(
                 expenses = uiState.expenses.values.flatten(),
                 onItemClick = onItemClick

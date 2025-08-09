@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
 import com.assignment.zospend.data.local.Expense
+import com.assignment.zospend.data.mock.MockExpense
 import com.assignment.zospend.domain.model.Category
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,11 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 data class ExpenseListUiState(
-    val expenses: Map<Category, List<Expense>> = emptyMap(),
+    val expenses: Map<Category?, List<Expense>> = emptyMap(),
     val selectedDate: LocalDate = LocalDate.now(),
     val isGroupedByCategory: Boolean = false,
     val totalAmount: Long = 0,
@@ -36,17 +38,27 @@ class ExpenseListViewModel(application: Application) : AndroidViewModel(applicat
     init {
         viewModelScope.launch {
             combine(
-                _selectedDate.flatMapLatest { date -> repository.expensesOn(date) },
+                _selectedDate.flatMapLatest { date ->
+                    if (LocalDate.now() == date) {
+                        repository.expensesOn(date)
+                    } else {
+                        flow {
+                            emit(MockExpense.generateMocksForDate(date))
+                        }
+                    }
+                },
                 _isGroupedByCategory
             ) { expenses, isGrouped ->
                 val totalAmount = expenses.sumOf { it.amount }
-                val groupedExpenses = if (isGrouped) {
+                val groupedExpenses = if (expenses.isEmpty()) {
+                    emptyMap()
+                } else if (isGrouped) {
                     expenses.groupBy { it.category }
                 } else {
-                    mapOf(Category.FOOD to expenses.sortedByDescending { it.createdAt })
+                    mapOf(null to expenses.sortedByDescending { it.createdAt })
                 }
                 ExpenseListUiState(
-                    expenses = groupedExpenses,
+                    expenses = groupedExpenses as Map<Category?, List<Expense>>,
                     selectedDate = _selectedDate.value,
                     isGroupedByCategory = isGrouped,
                     totalAmount = totalAmount,

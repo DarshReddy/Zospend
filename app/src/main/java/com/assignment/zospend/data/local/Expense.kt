@@ -17,7 +17,7 @@ data class Expense(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val title: String,
-    val amount: Long, // Stored in paise
+    val amount: Long, // Stored amount x100 for paise,cent etc
     val category: Category,
     val note: String?,
     val receiptUri: String?,

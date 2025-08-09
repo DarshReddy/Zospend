@@ -9,7 +9,7 @@ object CsvUtils {
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     fun dailyTotalsToCsv(dailyTotals: List<DailyTotal>): String {
-        val header = "Date,Amount (in paise)"
+        val header = "Date,Amount (x100)"
         val rows = dailyTotals.joinToString("\n") {
             "${it.date.format(dateFormatter)},${it.total}"
         }
@@ -17,7 +17,7 @@ object CsvUtils {
     }
 
     fun categoryTotalsToCsv(categoryTotals: Map<Category, Long>): String {
-        val header = "Category,Amount (in paise)"
+        val header = "Category,Amount (x100)"
         val rows = categoryTotals.entries.joinToString("\n") { (category, amount) ->
             "\"${category.name}\",$amount"
         }

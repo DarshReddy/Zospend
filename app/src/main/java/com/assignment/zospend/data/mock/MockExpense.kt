@@ -3,6 +3,9 @@ package com.assignment.zospend.data.mock
 import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.domain.model.Category
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
 object MockExpense {
@@ -48,9 +51,10 @@ object MockExpense {
         return "https://placehold.co/${w}x${h}?text=$title"
     }
 
-    fun next(random: Random = Random.Default, createdAt: Instant): Expense {
+    private fun next(random: Random = Random.Default, createdAt: Instant): Expense {
         val title = randomTitle(random)
         return Expense(
+            id = random.nextLong(100000, 10000000),
             title = title,
             note = randomNote(random),
             amount = randomAmountMinor(random),
@@ -58,5 +62,39 @@ object MockExpense {
             receiptUri = receiptUrl(title, random),
             createdAt = createdAt
         )
+    }
+
+    fun generateMockExpenses(): List<Expense> {
+        val mockExpenses = mutableListOf<Expense>()
+        val today = LocalDate.now()
+        for (i in 1..6) {
+            val date = today.minusDays(i.toLong())
+            repeat((0..Random.nextInt(1, 4)).count()) {
+                val instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                    .plus(
+                        (0..86400).random().toLong(),
+                        ChronoUnit.SECONDS
+                    ) // Random time within the day
+                mockExpenses.add(
+                    next(createdAt = instant)
+                )
+            }
+        }
+        return mockExpenses
+    }
+
+    fun generateMocksForDate(date: LocalDate): List<Expense> {
+        val mockExpenses = mutableListOf<Expense>()
+        repeat((0..Random.nextInt(1, 4)).count()) {
+            val instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant()
+                .plus(
+                    (0..86400).random().toLong(),
+                    ChronoUnit.SECONDS
+                ) // Random time within the day
+            mockExpenses.add(
+                next(createdAt = instant)
+            )
+        }
+        return mockExpenses
     }
 }

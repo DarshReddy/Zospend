@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
-import com.assignment.zospend.data.local.Expense
 import com.assignment.zospend.data.mock.MockExpense
 import com.assignment.zospend.domain.model.Category
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,7 +14,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
-import kotlin.random.Random
 
 data class ReportUiState(
     val dailyTotals: List<DailyTotal> = emptyList(),
@@ -33,28 +31,9 @@ class ReportViewModel(application: Application) : AndroidViewModel(application) 
 
     private val expenseRepository = ServiceLocator.provideRepository(application)
 
-    private fun generateMockExpenses(): List<Expense> {
-        val mockExpenses = mutableListOf<Expense>()
-        val today = LocalDate.now()
-        for (i in 1..6) {
-            val date = today.minusDays(i.toLong())
-            repeat((0..Random.nextInt(1, 4)).count()) {
-                val instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant()
-                    .plus(
-                        (0..86400).random().toLong(),
-                        ChronoUnit.SECONDS
-                    ) // Random time within the day
-                mockExpenses.add(
-                    MockExpense.next(createdAt = instant)
-                )
-            }
-        }
-        return mockExpenses
-    }
-
     val uiState: StateFlow<ReportUiState> = expenseRepository.allExpenses()
         .map { expenses ->
-            val mockExpenses = generateMockExpenses()
+            val mockExpenses = MockExpense.generateMockExpenses()
             val combinedExpenses = expenses + mockExpenses
 
             val sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS)

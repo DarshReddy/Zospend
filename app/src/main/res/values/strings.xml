@@ -7,7 +7,7 @@
     <string name="add_expense_title">Add Expense</string>
     <string name="expense_title_label">Title</string>
     <string name="expense_title_error">Title cannot be empty</string>
-    <string name="expense_amount_label">Amount (in Rupees)</string>
+    <string name="expense_amount_label">Amount</string>
     <string name="expense_amount_error">Amount must be a valid number greater than 0</string>
     <string name="expense_notes_label">Notes (Optional, max 100 chars)</string>
     <string name="add_receipt_button_label">Add Receipt</string>

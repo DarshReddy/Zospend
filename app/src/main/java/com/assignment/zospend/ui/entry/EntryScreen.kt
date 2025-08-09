@@ -66,7 +66,7 @@ fun EntryScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isFormValid by remember {
         derivedStateOf {
-            uiState.amount.isNotBlank() && uiState.title.isNotBlank() && uiState.category != null
+            uiState.amount.isNotBlank() && uiState.title.isNotBlank()
         }
     }
     rememberCoroutineScope()
