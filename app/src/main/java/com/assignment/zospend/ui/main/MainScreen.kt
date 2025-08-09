@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Today
 import androidx.compose.material.icons.outlined.Analytics
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Nightlight
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Today
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -40,6 +39,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.assignment.zospend.domain.model.Category
+import com.assignment.zospend.ui.components.LabelMedium
+import com.assignment.zospend.ui.components.TitleRegular
 import com.assignment.zospend.ui.entry.EntryScreen
 import com.assignment.zospend.ui.navigation.AppNavHost
 import com.assignment.zospend.ui.navigation.Screen
@@ -69,7 +70,7 @@ fun MainScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Zospend") },
+                title = { TitleRegular(text = "Zospend") },
                 actions = {
                     IconButton(onClick = onThemeToggle) {
                         Icon(
@@ -85,7 +86,7 @@ fun MainScreen(
                                 reportState.categoryTotals
                             )
                         }) {
-                            Icon(Icons.Default.Share, contentDescription = "Export CSV")
+                            Icon(Icons.Outlined.Share, contentDescription = "Export CSV")
                         }
                     }
                 }
@@ -145,7 +146,7 @@ fun AppBottomBar(
                     contentDescription = "Today"
                 )
             },
-            label = { Text("Today") },
+            label = { LabelMedium("Today") },
             selected = isTodaySelected,
             onClick = {
                 navController.navigate(Screen.Today.route) {
@@ -161,7 +162,7 @@ fun AppBottomBar(
                     contentDescription = "Reports"
                 )
             },
-            label = { Text("Reports") },
+            label = { LabelMedium("Reports") },
             selected = isReportsSelected,
             onClick = {
                 navController.navigate(Screen.Reports.route) {

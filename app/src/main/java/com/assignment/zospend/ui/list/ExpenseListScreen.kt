@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -36,6 +34,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.assignment.zospend.domain.model.Expense
+import com.assignment.zospend.ui.components.BodyLarge
+import com.assignment.zospend.ui.components.BodySmall
+import com.assignment.zospend.ui.components.TitleLarge
+import com.assignment.zospend.ui.components.TitleSmall
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
 import java.time.ZoneId
@@ -70,11 +72,7 @@ private fun SummaryHeader(totalAmount: Long, totalCount: Int) {
     val formattedAmount =
         NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
             .format(totalAmount / 100.0)
-    Text(
-        text = "Today's Total: $formattedAmount ($totalCount items)",
-        style = MaterialTheme.typography.headlineSmall,
-        fontWeight = FontWeight.Bold
-    )
+    TitleLarge(text = "Today's Total: $formattedAmount ($totalCount items)")
     Spacer(Modifier.height(16.dp))
 }
 
@@ -123,18 +121,15 @@ private fun ExpenseItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    expense.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                TitleSmall(
+                    expense.title
                 )
                 if (!expense.note.isNullOrEmpty()) {
-                    Text(expense.note, style = MaterialTheme.typography.bodySmall)
+                    BodySmall(expense.note)
                 }
-                Text(
+                BodySmall(
                     expense.createdAt.atZone(ZoneId.systemDefault())
-                        .format(DateTimeFormatter.ofPattern("hh:mm a")),
-                    style = MaterialTheme.typography.labelSmall
+                        .format(DateTimeFormatter.ofPattern("hh:mm a"))
                 )
             }
             expense.receiptUri?.let { uriString ->
@@ -151,10 +146,9 @@ private fun ExpenseItem(
                         .clickable { onReceiptClick(uri) }
                 )
             }
-            Text(
+            TitleSmall(
                 text = NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
-                    .format(expense.amount / 100.0),
-                style = MaterialTheme.typography.bodyLarge
+                    .format(expense.amount / 100.0)
             )
         }
     }
@@ -163,7 +157,7 @@ private fun ExpenseItem(
 @Composable
 private fun EmptyState() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("No expenses today. Tap the + button to add one!")
+        BodyLarge("No expenses today.\nTap the + button to add one!", textAlign = TextAlign.Center)
     }
 }
 

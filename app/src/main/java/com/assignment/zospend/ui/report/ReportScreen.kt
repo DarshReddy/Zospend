@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,9 +25,13 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.assignment.zospend.domain.model.Category
+import com.assignment.zospend.ui.components.BodyRegular
+import com.assignment.zospend.ui.components.BodySmall
+import com.assignment.zospend.ui.components.LabelMedium
+import com.assignment.zospend.ui.components.LabelSmall
+import com.assignment.zospend.ui.components.TitleRegular
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
@@ -42,7 +45,10 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("No expense data available for the last 7 days.")
+            BodyRegular(
+                "No expense data available for the last 7 days.",
+                textAlign = TextAlign.Center
+            )
         }
     } else {
         LazyColumn(
@@ -73,11 +79,10 @@ fun ReportSummary(total: Long) {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Total for last 7 days", style = MaterialTheme.typography.titleMedium)
-            Text(
+            BodyRegular("Total for last 7 days")
+            BodyRegular(
                 text = NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
                     .format(total / 100.0),
-                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.primary
             )
         }
@@ -90,7 +95,7 @@ fun DailyBarChart(dailyTotals: List<DailyTotal>) {
     val barColor = MaterialTheme.colorScheme.primary
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text("Daily Totals (Last 7 Days)", style = MaterialTheme.typography.titleMedium)
+        TitleRegular("Daily Totals (Last 7 Days)")
         Spacer(Modifier.height(8.dp))
         Canvas(
             modifier = Modifier
@@ -114,9 +119,8 @@ fun DailyBarChart(dailyTotals: List<DailyTotal>) {
         ) {
             val formatter = DateTimeFormatter.ofPattern("d MMM")
             dailyTotals.forEach {
-                Text(
+                BodySmall(
                     text = it.date.format(formatter),
-                    fontSize = 10.sp,
                     textAlign = TextAlign.Center
                 )
             }
@@ -128,7 +132,7 @@ fun DailyBarChart(dailyTotals: List<DailyTotal>) {
 @Composable
 fun CategoryTotals(categoryTotals: Map<Category, Long>) {
     Column {
-        Text("Totals by Category", style = MaterialTheme.typography.titleMedium)
+        LabelMedium("Totals by Category")
         Spacer(Modifier.height(8.dp))
         Card {
             Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -141,11 +145,10 @@ fun CategoryTotals(categoryTotals: Map<Category, Long>) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(category.name, style = MaterialTheme.typography.bodyLarge)
-                            Text(
+                            LabelSmall(category.name)
+                            BodyRegular(
                                 NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
                                     .format(total / 100.0),
-                                style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.secondary
                             )
                         }

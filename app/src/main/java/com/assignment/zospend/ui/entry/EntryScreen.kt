@@ -16,16 +16,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,11 +39,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.assignment.zospend.domain.model.Category
+import com.assignment.zospend.ui.components.BodyRegular
+import com.assignment.zospend.ui.components.LabelMedium
+import com.assignment.zospend.ui.components.PrimaryButton
+import com.assignment.zospend.ui.components.SecondaryButton
+import com.assignment.zospend.ui.components.TitleLarge
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
 
@@ -85,19 +86,19 @@ fun EntryScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Add Expense", style = MaterialTheme.typography.headlineSmall)
+        TitleLarge("Add Expense")
         Spacer(modifier = Modifier.height(24.dp))
 
         OutlinedTextField(
             value = uiState.title,
             onValueChange = viewModel::onTitleChange,
-            label = { Text("Title") },
+            label = { LabelMedium("Title") },
             isError = uiState.titleError,
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
         if (uiState.titleError) {
-            Text("Title cannot be empty", color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
+            BodyRegular("Title cannot be empty", color = MaterialTheme.colorScheme.error)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -105,18 +106,17 @@ fun EntryScreen(
         OutlinedTextField(
             value = uiState.amount,
             onValueChange = viewModel::onAmountChange,
-            label = { Text("Amount (in Rupees)") },
+            label = { LabelMedium("Amount (in Rupees)") },
             isError = uiState.amountError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
             singleLine = true,
-            prefix = { Text(NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0]).currency?.symbol.orEmpty()) },
+            prefix = { LabelMedium(NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0]).currency?.symbol.orEmpty()) },
             modifier = Modifier.fillMaxWidth()
         )
         if (uiState.amountError) {
-            Text(
+            BodyRegular(
                 "Amount must be a valid number greater than 0",
                 color = MaterialTheme.colorScheme.error,
-                fontSize = 12.sp
             )
         }
 
@@ -132,7 +132,7 @@ fun EntryScreen(
         OutlinedTextField(
             value = uiState.note,
             onValueChange = viewModel::onNoteChange,
-            label = { Text("Notes (Optional, max 100 chars)") },
+            label = { LabelMedium("Notes (Optional, max 100 chars)") },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(100.dp)
@@ -145,15 +145,17 @@ fun EntryScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            OutlinedButton(onClick = {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
+            SecondaryButton(
+                modifier = Modifier.fillMaxWidth(0.5f),
+                onClick = {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
                     )
-                )
-            }) {
-                Text(if (uiState.selectedReceiptUri == null) "Add Receipt" else "Change Receipt")
-            }
+                },
+                text = if (uiState.selectedReceiptUri == null) "Add Receipt" else "Change Receipt"
+            )
 
             if (uiState.selectedReceiptUri != null) {
                 Image(
@@ -176,12 +178,17 @@ fun EntryScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            Button(onClick = onDismiss, modifier = Modifier.padding(end = 16.dp)) {
-                Text("Cancel")
-            }
-            Button(onClick = viewModel::addExpense) {
-                Text("Save Expense")
-            }
+            SecondaryButton(
+                onClick = onDismiss,
+                text = "Cancel",
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .fillMaxWidth(0.5f)
+            )
+            PrimaryButton(
+                onClick = viewModel::addExpense,
+                text = "Save Expense"
+            )
         }
     }
 }
@@ -206,7 +213,7 @@ fun CategoryDropDown(
             readOnly = true,
             value = selectedCategory.name,
             onValueChange = {},
-            label = { Text("Category") },
+            label = { LabelMedium("Category") },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
         )
@@ -216,7 +223,7 @@ fun CategoryDropDown(
         ) {
             Category.entries.forEach { selectionOption ->
                 DropdownMenuItem(
-                    text = { Text(selectionOption.name) },
+                    text = { BodyRegular(selectionOption.name) },
                     onClick = {
                         onCategorySelected(selectionOption)
                         expanded = false
