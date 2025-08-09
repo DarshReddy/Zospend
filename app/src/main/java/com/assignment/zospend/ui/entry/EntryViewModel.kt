@@ -3,9 +3,9 @@ package com.assignment.zospend.ui.entry
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.assignment.zospend.data.ServiceLocator
 import com.assignment.zospend.domain.model.Category
 import com.assignment.zospend.domain.model.Expense
-import com.assignment.zospend.domain.repo.ExpenseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,8 +21,9 @@ data class EntryUiState(
     val addExpenseResult: Result<Unit>? = null
 )
 
-class EntryViewModel(private val repository: ExpenseRepository) : ViewModel() {
+class EntryViewModel() : ViewModel() {
 
+    val repository = ServiceLocator.provideRepository()
     private val _uiState = MutableStateFlow(EntryUiState())
     val uiState = _uiState.asStateFlow()
 
