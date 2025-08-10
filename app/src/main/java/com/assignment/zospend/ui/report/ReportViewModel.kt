@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
-import com.assignment.zospend.data.mock.MockExpense
 import com.assignment.zospend.domain.model.Category
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,18 +32,15 @@ class ReportViewModel(application: Application) : AndroidViewModel(application) 
 
     val uiState: StateFlow<ReportUiState> = expenseRepository.allExpenses()
         .map { expenses ->
-            val mockExpenses = MockExpense.generateMockExpenses()
-            val combinedExpenses = expenses + mockExpenses
-
             val sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS)
-            val recentExpenses = combinedExpenses.filter { it.createdAt.isAfter(sevenDaysAgo) }
+            val recentExpenses = expenses.filter { it.createdAt.isAfter(sevenDaysAgo) }
 
             // Calculate daily totals for the last 7 days
             val today = LocalDate.now()
             val last7Days = (0..6).map { today.minusDays(it.toLong()) }
             val dailyTotalsMap = recentExpenses
                 .groupBy { it.createdAt.atZone(ZoneId.systemDefault()).toLocalDate() }
-                .mapValues { (_, exps) -> exps.sumOf { it.amount } }
+                .mapValues { (_, expenses) -> expenses.sumOf { it.amount } }
 
             val dailyTotals = last7Days.map { date ->
                 DailyTotal(date, dailyTotalsMap[date] ?: 0L)
@@ -53,7 +49,7 @@ class ReportViewModel(application: Application) : AndroidViewModel(application) 
             // Calculate category totals for the last 7 days
             val categoryTotals = recentExpenses
                 .groupBy { it.category }
-                .mapValues { (_, exps) -> exps.sumOf { it.amount } }
+                .mapValues { (_, expenses) -> expenses.sumOf { it.amount } }
 
             val last7DaysTotal = recentExpenses.sumOf { it.amount }
 

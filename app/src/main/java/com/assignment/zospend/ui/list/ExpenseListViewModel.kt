@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.assignment.zospend.data.ServiceLocator
 import com.assignment.zospend.data.local.Expense
-import com.assignment.zospend.data.mock.MockExpense
 import com.assignment.zospend.domain.model.Category
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +12,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -38,15 +36,7 @@ class ExpenseListViewModel(application: Application) : AndroidViewModel(applicat
     init {
         viewModelScope.launch {
             combine(
-                _selectedDate.flatMapLatest { date ->
-                    if (LocalDate.now() == date) {
-                        repository.expensesOn(date)
-                    } else {
-                        flow {
-                            emit(MockExpense.generateMocksForDate(date))
-                        }
-                    }
-                },
+                _selectedDate.flatMapLatest { date -> repository.expensesOn(date) },
                 _isGroupedByCategory
             ) { expenses, isGrouped ->
                 val totalAmount = expenses.sumOf { it.amount }

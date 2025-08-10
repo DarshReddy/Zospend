@@ -21,7 +21,8 @@ data class Expense(
     val category: Category,
     val note: String?,
     val receiptUri: String?,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val isMock: Boolean = false
 ) {
     fun getCreatedAtLocalDate(zoneId: ZoneId = ZoneId.systemDefault()): LocalDate {
         return createdAt.atZone(zoneId).toLocalDate()

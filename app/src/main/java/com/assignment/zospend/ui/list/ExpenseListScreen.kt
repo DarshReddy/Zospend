@@ -48,6 +48,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.assignment.zospend.R
 import com.assignment.zospend.data.local.Expense
+import com.assignment.zospend.domain.model.Category
 import com.assignment.zospend.ui.components.BodyLarge
 import com.assignment.zospend.ui.components.BodySmall
 import com.assignment.zospend.ui.components.ImageDialog
@@ -92,16 +93,38 @@ fun ExpenseListScreen(
             onDateIconClick = { showDatePicker = true }
         )
         Spacer(Modifier.height(16.dp))
+
+        TotalsHeader(
+            totalAmount = uiState.totalAmount,
+            totalCount = uiState.totalCount
+        )
+
+        Spacer(Modifier.height(16.dp))
+
         ScreenWrapper(
             isLoading = uiState.isLoading,
             isEmpty = uiState.expenses.isEmpty(),
             emptyContent = { EmptyState() }
         ) {
             ExpenseItemsList(
-                expenses = uiState.expenses.values.flatten(),
+                expenses = uiState.expenses,
                 onItemClick = onItemClick
             )
         }
+    }
+}
+
+@Composable
+private fun TotalsHeader(totalAmount: Long, totalCount: Int) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        TitleLarge(text = "Total Expenses: $totalCount")
+        TitleLarge(
+            text = NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
+                .format(totalAmount / 100.0)
+        )
     }
 }
 
@@ -198,26 +221,50 @@ fun DateNavigationBar(
 
 @Composable
 private fun ExpenseItemsList(
-    expenses: List<Expense>,
+    expenses: Map<Category?, List<Expense>>,
     onItemClick: (Long) -> Unit
 ) {
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(expenses, key = { it.id }) { expense ->
-            ExpenseItem(
-                expense = expense,
-                onReceiptClick = { uri ->
-                    selectedImageUri = uri
-                },
-                onItemClick = { onItemClick(expense.id) },
-                modifier = Modifier.padding(vertical = 4.dp)
-            )
+        expenses.forEach { (category, expenses) ->
+            item {
+                CategoryHeader(
+                    category = category,
+                    totalAmount = expenses.sumOf { it.amount }
+                )
+            }
+            items(expenses, key = { it.id }) { expense ->
+                ExpenseItem(
+                    expense = expense,
+                    onReceiptClick = { uri ->
+                        selectedImageUri = uri
+                    },
+                    onItemClick = { onItemClick(expense.id) },
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
         }
     }
 
     if (selectedImageUri != null) {
         ImageDialog(selectedImageUri.toString(), onDismiss = { selectedImageUri = null })
+    }
+}
+
+@Composable
+private fun CategoryHeader(category: Category?, totalAmount: Long) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        TitleSmall(text = category?.name ?: "Uncategorized")
+        TitleSmall(
+            text = NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
+                .format(totalAmount / 100.0)
+        )
     }
 }
 

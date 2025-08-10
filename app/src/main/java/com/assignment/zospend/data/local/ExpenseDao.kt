@@ -17,6 +17,12 @@ interface ExpenseDao {
     @Insert
     suspend fun insertExpense(expense: Expense)
 
+    @Insert
+    suspend fun insertExpenses(expenses: List<Expense>)
+
     @Update
     suspend fun updateExpense(expense: Expense)
+
+    @Query("DELETE FROM expenses where isMock = true")
+    suspend fun deleteAllMockExpenses()
 }

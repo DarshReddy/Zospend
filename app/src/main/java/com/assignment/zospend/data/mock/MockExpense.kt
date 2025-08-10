@@ -40,27 +40,29 @@ object MockExpense {
 
     private fun randomAmountMinor(r: Random): Long {
         // ₹100.00 to ₹25,000.00; paise at 0 or 50 for realism
-        val rupees = r.nextInt(100, 25_000)
-        val paise = if (r.nextBoolean()) 0 else 50
+        val rupees = r.nextInt(100, 1_000)
+        val paise = r.nextInt(0, 99)
         return rupees * 100L + paise
     }
 
     private fun receiptUrl(title: String, r: Random): String {
         val w = listOf(480, 600, 720).random(r)
         val h = listOf(720, 800, 960).random(r)
-        return "https://placehold.co/${w}x${h}?text=$title"
+        return "https://dummyimage.com/${w}x${h}/efefef/000000.png&text=${
+            title.replace(" ", "+")
+        }"
     }
 
     private fun next(random: Random = Random.Default, createdAt: Instant): Expense {
         val title = randomTitle(random)
         return Expense(
-            id = random.nextLong(100000, 10000000),
             title = title,
             note = randomNote(random),
             amount = randomAmountMinor(random),
             category = Category.entries.random(),
             receiptUri = receiptUrl(title, random),
-            createdAt = createdAt
+            createdAt = createdAt,
+            isMock = true
         )
     }
 
@@ -79,21 +81,6 @@ object MockExpense {
                     next(createdAt = instant)
                 )
             }
-        }
-        return mockExpenses
-    }
-
-    fun generateMocksForDate(date: LocalDate): List<Expense> {
-        val mockExpenses = mutableListOf<Expense>()
-        repeat((0..Random.nextInt(1, 4)).count()) {
-            val instant = date.atStartOfDay(ZoneId.systemDefault()).toInstant()
-                .plus(
-                    (0..86400).random().toLong(),
-                    ChronoUnit.SECONDS
-                ) // Random time within the day
-            mockExpenses.add(
-                next(createdAt = instant)
-            )
         }
         return mockExpenses
     }
