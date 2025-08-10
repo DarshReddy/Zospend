@@ -26,11 +26,15 @@ daily spend. Built with **Jetpack Compose** and **MVVM**, with local persistence
 
 ## Screenshots
 
-*(Add images here)*
-
 | Expense List | Expense Entry | Report         |
 |--------------|---------------|----------------|
-| `[List.png]` | `[Entry.png]` | `[Report.png]` |
+|  <img width="216" height="480" alt="Screenshot_20250810_124111" src="https://github.com/user-attachments/assets/a4625acf-44d9-4d34-84a1-a804d7226b44" />| <img width="216" height="480" alt="Screenshot_20250810_124348" src="https://github.com/user-attachments/assets/5f0cfa30-9cdc-49fe-b6bd-ef8828c99cb8" /> | <img width="216" height="480" alt="Screenshot_20250810_124220" src="https://github.com/user-attachments/assets/dbde7880-9728-4ae6-b3f4-6fb46477d8fb" /> |
+
+<img width="216" height="480" alt="Screenshot_20250810_124452" src="https://github.com/user-attachments/assets/b56d75ac-dc62-47c0-9f32-a6ef65f7eacf" />
+<img width="216" height="480" alt="Screenshot_20250810_124428" src="https://github.com/user-attachments/assets/1288d9e1-3b75-432a-812d-dcc617c43f90" />
+<img width="216" height="480" alt="Screenshot_20250810_124420" src="https://github.com/user-attachments/assets/5e3e6431-032c-476f-9ccb-689034694810" />
+<img width="216" height="480" alt="Screenshot_20250810_124242" src="https://github.com/user-attachments/assets/bb844705-7c17-4f8c-8164-5c741038c58f" />
+
 
 ## Architecture & Tech
 
@@ -49,27 +53,26 @@ app/
     entry/          # EntryScreen, EntryViewModel
     list/           # ExpenseListScreen, ExpenseListViewModel
     report/         # ReportScreen, ReportViewModel
-    components/     # Reusable UI bits (chips, headers, empty state, etc.)
+    components/     # Reusable UI bits (dropdowns, dialogs, chart etc.)
     navigation/     # NavGraph
     theme/          # Material theme
+    main/           # Main screen, Wrapper screen
   domain/
     model/          # Expense, Category
     repo/           # ExpenseRepository, implementations
   data/
-    room/           # Entities, DAO, Database (if split)
+    local/          # Entities, DAO, Database
+    mock/           # Mock data creation 
   util/             # Formatting, CSV builder, share helpers
   tests/            # Unit + UI tests
 ```
 
 ## Navigation
 
-- **Start**: **List (Today)**
-- **FAB**: Add → **Entry** (full-screen form)
-- **Top action**: **Report**
+- **Bottom Nav**: **List (Today by Default)** **Report**
+- **FAB**: Add → **Entry** (bottomsheet form)
+- **Update Expense**: Full screen update expense form
 - **Back**: Entry → List; Report → List
-
-*(Bottom navigation is intentionally avoided; Entry is a transient task, not a top-level
-destination.)*
 
 ## How to Run
 
@@ -82,17 +85,15 @@ destination.)*
 
 ## Decisions & Trade-offs
 
-- **Room vs In-Memory**: Chose **Room** to satisfy persistence and mirror real usage, while keeping
-  an in-memory path easy to swap behind the repository interface.
+- **Room vs In-Memory**: Chose **Room** to satisfy persistence and mirror real usage.
 - **Date UX**: A **calendar** picker allows for quick navigation to any date, providing more
   flexibility than simple next/previous day buttons.
 - **Charts**: Kept to **Canvas** for zero deps and full control.
-- **Money type**: **Paise (Long)** to avoid floating point rounding issues.
+- **Money type**: **Paise/Cents (Long)** to avoid floating point rounding issues.
 
 ## How I Used AI
 
-AI (Gemini agent in Android Studio + ChatGPT) was used as a coding partner for scaffolding
+AI (Gemini Agent in Android Studio + ChatGPT) was used as a coding partner for scaffolding
 MVVM/Compose files, refining validation/UX, and generating small, compile-ready patches. It helped
-diagnose build issues (KSP, missing test deps), tuned recomposition with `remember`/
-`derivedStateOf`, and added accessibility & haptics. AI also drafted the README and produced a brief
+diagnose build issues (KSP, missing test deps), tuned recomposition, and added accessibility & haptics. AI also drafted the README and produced a brief
 requirement compliance checklist and test scaffolds.
