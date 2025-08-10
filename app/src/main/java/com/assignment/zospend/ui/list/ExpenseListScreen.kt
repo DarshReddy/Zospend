@@ -17,9 +17,16 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Card
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,6 +56,7 @@ import com.assignment.zospend.ui.components.TitleSmall
 import com.assignment.zospend.ui.main.ScreenWrapper
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
+import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -60,6 +68,17 @@ fun ExpenseListScreen(
     onItemClick: (Long) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    if (showDatePicker) {
+        ExpenseDatePickerDialog(
+            onDismiss = { showDatePicker = false },
+            onDateSelected = {
+                viewModel.onDateSelected(it)
+                showDatePicker = false
+            }
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -69,7 +88,8 @@ fun ExpenseListScreen(
         DateNavigationBar(
             selectedDate = uiState.selectedDate,
             onPreviousClick = viewModel::onPreviousDayClicked,
-            onNextClick = viewModel::onNextDayClicked
+            onNextClick = viewModel::onNextDayClicked,
+            onDateIconClick = { showDatePicker = true }
         )
         Spacer(Modifier.height(16.dp))
         ScreenWrapper(
@@ -85,11 +105,54 @@ fun ExpenseListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExpenseDatePickerDialog(
+    onDismiss: () -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
+) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = Instant.now().toEpochMilli(),
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                return utcTimeMillis <= Instant.now().toEpochMilli()
+            }
+        }
+    )
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        onDateSelected(
+                            Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+                        )
+                    }
+                }
+            ) {
+                BodyLarge(stringResource(id = android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                BodyLarge(stringResource(id = android.R.string.cancel))
+            }
+        }
+    ) {
+        DatePicker(
+            state = datePickerState
+        )
+    }
+}
+
+
 @Composable
 fun DateNavigationBar(
     selectedDate: LocalDate,
     onPreviousClick: () -> Unit,
-    onNextClick: () -> Unit
+    onNextClick: () -> Unit,
+    onDateIconClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -102,15 +165,28 @@ fun DateNavigationBar(
                 contentDescription = stringResource(id = R.string.previous_day)
             )
         }
-        TitleLarge(
-            if (selectedDate != LocalDate.now()) {
-                selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
-            } else {
-                stringResource(id = R.string.today_expenses_title)
-            },
+
+        Row(
             modifier = Modifier.weight(1f),
-            textAlign = TextAlign.Center
-        )
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TitleLarge(
+                if (selectedDate != LocalDate.now()) {
+                    selectedDate.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
+                } else {
+                    stringResource(id = R.string.today_expenses_title)
+                },
+                textAlign = TextAlign.Center
+            )
+            IconButton(onClick = onDateIconClick) {
+                Icon(
+                    Icons.Default.CalendarMonth,
+                    contentDescription = stringResource(id = R.string.select_date)
+                )
+            }
+        }
+
         IconButton(onClick = onNextClick, enabled = selectedDate != LocalDate.now()) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowForward,

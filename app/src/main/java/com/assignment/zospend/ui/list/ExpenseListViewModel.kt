@@ -30,7 +30,7 @@ data class ExpenseListUiState(
 class ExpenseListViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = ServiceLocator.provideRepository(application)
     private val _selectedDate = MutableStateFlow(LocalDate.now())
-    private val _isGroupedByCategory = MutableStateFlow(false)
+    private val _isGroupedByCategory = MutableStateFlow(true)
 
     private val _uiState = MutableStateFlow(ExpenseListUiState())
     val uiState: StateFlow<ExpenseListUiState> = _uiState.asStateFlow()
@@ -77,5 +77,9 @@ class ExpenseListViewModel(application: Application) : AndroidViewModel(applicat
 
     fun onNextDayClicked() {
         _selectedDate.value = _selectedDate.value.plusDays(1)
+    }
+
+    fun onDateSelected(date: LocalDate) {
+        _selectedDate.value = date
     }
 }
