@@ -1,0 +1,30 @@
+<!-- res/drawable/ic_launcher_monochrome.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Quirky bar-chart glyph (no text, no currency) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M4,13H8V20H4Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M10,10H14V20H10Z" />
+    <path
+        android:fillColor="#000000"
+        android:pathData="M16,6H20V20H16Z" />
+
+    <!-- Little 'add' bubble for personality -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M17.5,14a3.5,3.5 0 1,0 0,7a3.5,3.5 0 1,0 0,-7Z" />
+    <path
+        android:fillAlpha="1"
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M17,16h1v3h-1z" />
+    <path
+        android:fillAlpha="1"
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M16,17h3v1h-3z" />
+</vector>
