@@ -16,6 +16,7 @@ import java.time.temporal.ChronoUnit
 
 data class ReportUiState(
     val dailyTotals: List<DailyTotal> = emptyList(),
+    val dailyCategoryTotals: Map<LocalDate, Map<Category, Long>> = emptyMap(),
     val categoryTotals: Map<Category, Long> = emptyMap(),
     val last7DaysTotal: Long = 0L,
     val isLoading: Boolean = false
@@ -42,6 +43,14 @@ class ReportViewModel(application: Application) : AndroidViewModel(application) 
                 .groupBy { it.createdAt.atZone(ZoneId.systemDefault()).toLocalDate() }
                 .mapValues { (_, expenses) -> expenses.sumOf { it.amount } }
 
+            val dailyCategoryTotalsMap = recentExpenses
+                .groupBy { it.createdAt.atZone(ZoneId.systemDefault()).toLocalDate() }
+                .mapValues { (_, expenses) ->
+                    expenses
+                        .groupBy { it.category }
+                        .mapValues { (category, expenses) -> expenses.sumOf { it.amount } }
+                }
+
             val dailyTotals = last7Days.map { date ->
                 DailyTotal(date, dailyTotalsMap[date] ?: 0L)
             }.reversed() // Reverse to have the oldest day first for charting
@@ -55,6 +64,7 @@ class ReportViewModel(application: Application) : AndroidViewModel(application) 
 
             ReportUiState(
                 dailyTotals = dailyTotals,
+                dailyCategoryTotals = dailyCategoryTotalsMap,
                 categoryTotals = categoryTotals,
                 last7DaysTotal = last7DaysTotal,
                 isLoading = false

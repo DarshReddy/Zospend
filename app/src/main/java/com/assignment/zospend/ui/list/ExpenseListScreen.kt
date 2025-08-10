@@ -260,7 +260,22 @@ private fun CategoryHeader(category: Category?, totalAmount: Long) {
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        TitleSmall(text = category?.name ?: "Uncategorized")
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (category != null) {
+                Icon(
+                    imageVector = category.icon,
+                    contentDescription = stringResource(
+                        id = R.string.category_icon_content_description,
+                        category.name
+                    ),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(end = 8.dp),
+                    tint = category.color
+                )
+            }
+            TitleSmall(text = category?.name ?: "Uncategorized")
+        }
         TitleSmall(
             text = NumberFormat.getCurrencyInstance(LocalConfiguration.current.locales[0])
                 .format(totalAmount / 100.0)

@@ -1,6 +1,5 @@
 package com.assignment.zospend.ui.report
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,8 +20,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -32,10 +29,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.assignment.zospend.R
 import com.assignment.zospend.domain.model.Category
 import com.assignment.zospend.ui.components.BodyRegular
-import com.assignment.zospend.ui.components.BodySmall
+import com.assignment.zospend.ui.components.FilledLineChart
 import com.assignment.zospend.ui.components.LabelMedium
 import com.assignment.zospend.ui.components.LabelSmall
-import com.assignment.zospend.ui.components.TitleRegular
 import com.assignment.zospend.ui.main.ScreenWrapper
 import com.assignment.zospend.ui.theme.ZospendTheme
 import java.text.NumberFormat
@@ -47,7 +43,7 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
 
     ScreenWrapper(
         isLoading = uiState.isLoading,
-        isEmpty = uiState.dailyTotals.isEmpty() || uiState.last7DaysTotal == 0L,
+        isEmpty = uiState.dailyCategoryTotals.isEmpty() || uiState.last7DaysTotal == 0L,
         emptyContent = { EmptyState() }
     ) {
         LazyColumn(
@@ -59,7 +55,17 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
                 ReportSummary(uiState.last7DaysTotal)
             }
             item {
-                DailyBarChart(uiState.dailyTotals)
+                FilledLineChart(
+                    data = uiState.dailyTotals.map {
+                        it.date.format(
+                            DateTimeFormatter.ofPattern(
+                                "d MMM"
+                            )
+                        ) to it.total.toInt().div(100)
+                    }.toList(),
+                    maxYCount = 5,
+                    yInterval = 500,
+                )
             }
             item {
                 CategoryTotals(uiState.categoryTotals)
@@ -84,45 +90,6 @@ fun ReportSummary(total: Long) {
                     .format(total / 100.0),
                 color = MaterialTheme.colorScheme.primary
             )
-        }
-    }
-}
-
-@Composable
-fun DailyBarChart(dailyTotals: List<DailyTotal>) {
-    val maxAmount = dailyTotals.maxOfOrNull { it.total } ?: 1L
-    val barColor = MaterialTheme.colorScheme.primary
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        TitleRegular("Daily Totals (Last 7 Days)")
-        Spacer(Modifier.height(8.dp))
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        ) {
-            val barWidth = size.width / (dailyTotals.size * 2)
-            dailyTotals.forEachIndexed { index, dailyTotal ->
-                val barHeight = (dailyTotal.total.toFloat() / maxAmount.toFloat()) * size.height
-                val startX = (index * 2 + 0.5f) * barWidth
-                drawRect(
-                    color = barColor,
-                    topLeft = Offset(x = startX, y = size.height - barHeight),
-                    size = Size(barWidth, barHeight)
-                )
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            val formatter = DateTimeFormatter.ofPattern("d MMM")
-            dailyTotals.forEach {
-                BodySmall(
-                    text = it.date.format(formatter),
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }
@@ -152,7 +119,7 @@ fun CategoryTotals(categoryTotals: Map<Category, Long>) {
                                         category.name
                                     ),
                                     modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    tint = category.color
                                 )
                                 LabelSmall(category.name, modifier = Modifier.padding(start = 8.dp))
                             }
