@@ -72,27 +72,6 @@ compliance checklist against the brief.
 
 > Notes: Prompts were consolidated and outcomes were tightened for clarity.
 
-## Features
-
-**Core**
-
-- **Add Expense**: Title, amount (₹), category (Staff/Travel/Food/Utility), optional notes, optional
-  receipt image.
-- **Daily List**: View today’s expenses by default; select a date using a **calendar**; totals +
-  count; empty state.
-- **Report (7 days)**: Daily totals + category-wise totals; simple **Canvas** line chart showing
-  category trends.
-- **Export**: Share **CSV** (daily + category totals) via Android share sheet.
-
-**Polish**
-
-- **Receipt previews**: Thumbnail in list; tap to view full image in a dialog.
-- **Duplicate detection**: Prevents accidental double entries (same title+amount+day within 5
-  minutes).
-- **Accessibility**: Content descriptions, error semantics; light haptics on successful add.
-- **Modern UI**: Pure Compose, Material 3, micro-animations (e.g., add confirmation chip).
-- **Tests**: Unit tests (repository) + a basic Compose UI test (entry validation & success).
-
 ## Feature Checklist
 
 - [x] **Expense Entry**: Add new expenses with title, amount, category, notes, and an optional
@@ -109,7 +88,7 @@ compliance checklist against the brief.
 - [ ] **Cloud Sync**: Back up and sync expenses across multiple devices.
 
 ## APK Download Link
-[APK Drive Link]([url](https://drive.google.com/file/d/1BqNql8cBC_rST8dG7cthTtViX5iAeoVm/view?usp=sharing))
+[APK Drive Link](https://drive.google.com/file/d/1BqNql8cBC_rST8dG7cthTtViX5iAeoVm/view?usp=sharing)
 
 ## Screenshots
 
