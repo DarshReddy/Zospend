@@ -85,7 +85,7 @@ app/
 ## Navigation
 
 - **Bottom Nav**: **List (Today by Default)** **Report**
-- **FAB**: Add → **Entry** (bottomsheet form)
+- **FAB**: Add → **Entry** (bottom sheet form)
 - **Update Expense**: Full screen update expense form
 - **Back**: Entry → List; Report → List
 
@@ -103,12 +103,13 @@ app/
 - **Room vs In-Memory**: Chose **Room** to satisfy persistence and mirror real usage.
 - **Date UX**: A **calendar** picker allows for quick navigation to any date, providing more
   flexibility than simple next/previous day buttons.
-- **Charts**: Kept to **Canvas** for zero deps and full control.
+- **Charts**: Kept to **Canvas** for zero dependencies and full control.
 - **Money type**: **Paise/Cents (Long)** to avoid floating point rounding issues.
 
 ## How I Used AI
 
 AI (Gemini Agent in Android Studio + ChatGPT) was used as a coding partner for scaffolding
 MVVM/Compose files, refining validation/UX, and generating small, compile-ready patches. It helped
-diagnose build issues (KSP, missing test deps), tuned recomposition, and added accessibility & haptics. AI also drafted the README and produced a brief
+diagnose build issues (KSP, missing test dependencies), tuned recomposition, and added
+accessibility & haptics. AI also drafted the README and produced a brief
 requirement compliance checklist and test scaffolds.
