@@ -24,11 +24,26 @@ daily spend. Built with **Jetpack Compose** and **MVVM**, with local persistence
 - **Modern UI**: Pure Compose, Material 3, micro-animations (e.g., add confirmation chip).
 - **Tests**: Unit tests (repository) + a basic Compose UI test (entry validation & success).
 
+## Feature Checklist
+
+- [x] **Expense Entry**: Add new expenses with title, amount, category, notes, and an optional
+  receipt image.
+- [x] **Daily Expense List**: View expenses for any selected day using a calendar picker.
+- [x] **Daily Totals**: See the total amount and count of expenses for the selected day.
+- [x] **7-Day Report**: Visualize category spending trends over the last week with a line chart.
+- [x] **CSV Export**: Share daily and category totals via the Android share sheet.
+- [x] **Dynamic Chart Scaling**: The report chart's Y-axis automatically adjusts to the data.
+- [x] **Theme-Aware UI**: Colors adapt to the system's light or dark theme.
+- [x] **Image Previews**: View receipt thumbnails in the list and tap to see the full image.
+- [ ] **Search & Filter**: Search for expenses by title or filter by category.
+- [ ] **Monthly Reports**: View aggregated expense data on a monthly basis.
+- [ ] **Cloud Sync**: Back up and sync expenses across multiple devices.
+
 ## Screenshots
 
-| Expense List | Expense Entry | Report         |
-|--------------|---------------|----------------|
-|  <img width="216" height="480" alt="Screenshot_20250810_124111" src="https://github.com/user-attachments/assets/a4625acf-44d9-4d34-84a1-a804d7226b44" />| <img width="216" height="480" alt="Screenshot_20250810_124348" src="https://github.com/user-attachments/assets/5f0cfa30-9cdc-49fe-b6bd-ef8828c99cb8" /> | <img width="216" height="480" alt="Screenshot_20250810_124220" src="https://github.com/user-attachments/assets/dbde7880-9728-4ae6-b3f4-6fb46477d8fb" /> |
+| Expense List                                                                                                                                            | Expense Entry                                                                                                                                           | Report                                                                                                                                                  |
+|---------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <img width="216" height="480" alt="Screenshot_20250810_124111" src="https://github.com/user-attachments/assets/a4625acf-44d9-4d34-84a1-a804d7226b44" /> | <img width="216" height="480" alt="Screenshot_20250810_124348" src="https://github.com/user-attachments/assets/5f0cfa30-9cdc-49fe-b6bd-ef8828c99cb8" /> | <img width="216" height="480" alt="Screenshot_20250810_124220" src="https://github.com/user-attachments/assets/dbde7880-9728-4ae6-b3f4-6fb46477d8fb" /> |
 
 <img width="216" height="480" alt="Screenshot_20250810_124452" src="https://github.com/user-attachments/assets/b56d75ac-dc62-47c0-9f32-a6ef65f7eacf" />
 <img width="216" height="480" alt="Screenshot_20250810_124428" src="https://github.com/user-attachments/assets/1288d9e1-3b75-432a-812d-dcc617c43f90" />
