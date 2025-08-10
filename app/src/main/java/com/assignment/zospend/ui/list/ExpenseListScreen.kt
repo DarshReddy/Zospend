@@ -56,6 +56,7 @@ import com.assignment.zospend.ui.components.TitleLarge
 import com.assignment.zospend.ui.components.TitleSmall
 import com.assignment.zospend.ui.main.ScreenWrapper
 import com.assignment.zospend.ui.theme.ZospendTheme
+import com.assignment.zospend.ui.theme.categoryColor
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -271,7 +272,7 @@ private fun CategoryHeader(category: Category?, totalAmount: Long) {
                     modifier = Modifier
                         .size(24.dp)
                         .padding(end = 8.dp),
-                    tint = category.color
+                    tint = categoryColor(category = category)
                 )
             }
             TitleSmall(text = category?.name ?: "Uncategorized")

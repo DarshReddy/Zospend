@@ -34,6 +34,7 @@ import com.assignment.zospend.ui.components.LabelMedium
 import com.assignment.zospend.ui.components.LabelSmall
 import com.assignment.zospend.ui.main.ScreenWrapper
 import com.assignment.zospend.ui.theme.ZospendTheme
+import com.assignment.zospend.ui.theme.categoryColor
 import java.text.NumberFormat
 import java.time.format.DateTimeFormatter
 
@@ -43,7 +44,7 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
 
     ScreenWrapper(
         isLoading = uiState.isLoading,
-        isEmpty = uiState.dailyCategoryTotals.isEmpty() || uiState.last7DaysTotal == 0L,
+        isEmpty = uiState.dailyTotals.isEmpty() || uiState.last7DaysTotal == 0L,
         emptyContent = { EmptyState() }
     ) {
         LazyColumn(
@@ -62,9 +63,7 @@ fun ReportScreen(viewModel: ReportViewModel = viewModel()) {
                                 "d MMM"
                             )
                         ) to it.total.toInt().div(100)
-                    }.toList(),
-                    maxYCount = 5,
-                    yInterval = 500,
+                    }.toList()
                 )
             }
             item {
@@ -119,7 +118,7 @@ fun CategoryTotals(categoryTotals: Map<Category, Long>) {
                                         category.name
                                     ),
                                     modifier = Modifier.size(24.dp),
-                                    tint = category.color
+                                    tint = categoryColor(category = category)
                                 )
                                 LabelSmall(category.name, modifier = Modifier.padding(start = 8.dp))
                             }

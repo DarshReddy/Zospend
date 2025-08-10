@@ -9,9 +9,10 @@ daily spend. Built with **Jetpack Compose** and **MVVM**, with local persistence
 
 - **Add Expense**: Title, amount (₹), category (Staff/Travel/Food/Utility), optional notes, optional
   receipt image.
-- **Daily List**: View today’s expenses by default; navigate **Previous / Next** days; totals +
+- **Daily List**: View today’s expenses by default; select a date using a **calendar**; totals +
   count; empty state.
-- **Report (7 days)**: Daily totals + category-wise totals; simple **Canvas** bar chart.
+- **Report (7 days)**: Daily totals + category-wise totals; simple **Canvas** line chart showing
+  category trends.
 - **Export**: Share **CSV** (daily + category totals) via Android share sheet.
 
 **Polish**
@@ -83,8 +84,8 @@ destination.)*
 
 - **Room vs In-Memory**: Chose **Room** to satisfy persistence and mirror real usage, while keeping
   an in-memory path easy to swap behind the repository interface.
-- **Date UX**: **Prev/Next** day controls deliver speed for daily ops; a full calendar can be added
-  later if needed.
+- **Date UX**: A **calendar** picker allows for quick navigation to any date, providing more
+  flexibility than simple next/previous day buttons.
 - **Charts**: Kept to **Canvas** for zero deps and full control.
 - **Money type**: **Paise (Long)** to avoid floating point rounding issues.
 

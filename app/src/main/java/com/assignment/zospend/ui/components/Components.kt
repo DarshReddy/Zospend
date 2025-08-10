@@ -39,6 +39,10 @@ import androidx.compose.ui.window.DialogProperties
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.assignment.zospend.R
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.log10
+import kotlin.math.pow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -120,9 +124,7 @@ fun FilledLineChart(
         Pair("Fri", 4),
         Pair("Sat", 5),
         Pair("Sun", 9),
-    ),
-    maxYCount: Int = 5,
-    yInterval: Int = 2
+    )
 ) {
     val density = LocalDensity.current
     val spacingY = density.run { 32.dp.toPx() }
@@ -137,6 +139,9 @@ fun FilledLineChart(
         textSize = density.run { 12.sp.toPx() }
     }
 
+    val (maxY, yInterval) = remember(data) {
+        calculateYAxisParameters(data)
+    }
 
     Canvas(
         modifier = Modifier
@@ -156,6 +161,7 @@ fun FilledLineChart(
 
         // y axis text
         val availableHeight = size.height - spacingY
+        val maxYCount = if (yInterval > 0) maxY / yInterval else 0
         (0..maxYCount).forEach { i ->
             drawContext.canvas.nativeCanvas.apply {
                 drawText(
@@ -173,7 +179,7 @@ fun FilledLineChart(
                 val info = data[i]
                 val x1 = startX + i * spacePerDay
                 val y1 =
-                    availableHeight - ((info.second?.times(availableHeight))?.div(maxYCount * yInterval)
+                    availableHeight - ((info.second?.times(availableHeight))?.div(maxY)
                         ?: 0f)
 
                 if (i == 0) {
@@ -215,4 +221,27 @@ fun FilledLineChart(
             ),
         )
     }
+}
+
+private fun calculateYAxisParameters(data: List<Pair<String, Int?>>): Pair<Int, Int> {
+    val maxDataValue = data.mapNotNull { it.second }.maxOrNull() ?: 0
+    if (maxDataValue == 0) return 100 to 25
+
+    val range = maxDataValue.toDouble()
+    val roughInterval = range / 4
+    val exponent = floor(log10(roughInterval))
+    val powerOf10 = 10.0.pow(exponent)
+    val fraction = roughInterval / powerOf10
+
+    val niceFraction = when {
+        fraction <= 1.0 -> 1.0
+        fraction <= 2.0 -> 2.0
+        fraction <= 5.0 -> 5.0
+        else -> 10.0
+    }
+
+    val interval = (niceFraction * powerOf10).toInt()
+    val niceMaxY = (ceil(maxDataValue.toDouble() / interval) * interval).toInt()
+
+    return niceMaxY to interval
 }
